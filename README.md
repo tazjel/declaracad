@@ -3,11 +3,12 @@
 A declarative parametric 3D modeling program built using [OpenCascade](https://github.com/tpaviot/pythonocc-core)
 and [enaml](https://github.com/nucleic/enaml/). 
 
+[![Declaracad preview](https://img.youtube.com/vi/SeVcerBlpWE/0.jpg)](https://youtu.be/SeVcerBlpWE)
+
 It's similar to [OpenSCAD](http://www.openscad.org/)
 in that everything is intended to be defined programatically. However the 
 language being used is enaml (a superset of python) instead of javascript.  Python users/developers will find this very easy and intuitive.
 
-[![Declaracad preview](https://img.youtube.com/vi/SeVcerBlpWE/0.jpg)](https://youtu.be/SeVcerBlpWE)
 
 
 See [the project site](https://www.codelv.com/projects/declaracad/) (coming soon).
