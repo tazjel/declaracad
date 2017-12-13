@@ -12,6 +12,21 @@ this very easy and intuitive.
 See [the project site](https://www.codelv.com/projects/declaracad/) or look at the examples.
 
 
+## Features
+
+Currently the following 3D features can be used:
+
+1. Basic shapes (Box, Sphere, Cylinder, Wedge, Torus) see [shapes](blob/master/declaracad/occ/shape.py)
+2. Boolean operations (Cut, Fuse, Common) see [algo](blob/master/declaracad/occ/algo.py)
+3. Fillet and chamfer edges see [algo](blob/master/declaracad/occ/algo.py)
+4. Drawing of wires and faces see [draw](blob/master/declaracad/occ/draw.py)
+4. Pipes 
+5. LinearForm, RevolutionForm
+5. ThickSolid, ThroughSections
+
+See the [examples](blob/master/examples) for demos.
+
+
 ## Example
 
 This is generates a turners cube of a given number of levels.
@@ -39,13 +54,6 @@ enamldef TurnersCube(Part):
                 radius = loop_item/1.5
 
 ```
-
-## Features
-
-Currently the following 3D features can be used:
-
-1. Basic shapes (Box, Sphere, Cylinder, Wedge, Torus,) see [shapes]()
-2. Boolean operations (Cut, Fillet, )
 
 ## Installing
 
