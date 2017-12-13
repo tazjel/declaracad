@@ -5,8 +5,7 @@ and [enaml](https://github.com/nucleic/enaml/).
 
 It's similar to [OpenSCAD](http://www.openscad.org/)
 in that everything is intended to be defined programatically. However the 
-language being used is enaml (a superset of python) instead of javascript.  
-Python users/developers will find this very easy and intuitive.
+language being used is enaml (a superset of python) instead of javascript.  Python users/developers will find this very easy and intuitive.
 
 [![Declaracad preview](https://img.youtube.com/vi/SeVcerBlpWE/0.jpg)](https://youtu.be/SeVcerBlpWE)
 
