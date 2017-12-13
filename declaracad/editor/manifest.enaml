@@ -1,0 +1,245 @@
+"""
+Copyright (c) 2017, Jairus Martin.
+
+Distributed under the terms of the GPL v3 License.
+
+The full license is in the file LICENSE, distributed with this software.
+
+Created on Dec 6, 2017
+
+@author: jrm
+"""
+import os
+import enaml
+from glob import glob
+from collections import OrderedDict
+from enaml.widgets.api import FileDialogEx
+from enaml.core.api import Looper, Conditional
+from enaml.workbench.api import Extension, PluginManifest
+from enaml.workbench.core.api import Command
+from enaml.workbench.ui.api import ActionItem, MenuItem, ItemGroup, Autostart
+from declaracad.ui.extensions import DOCK_ITEM_POINT, DockItem
+
+
+def plugin_command(name, event):
+    editor = event.workbench.get_plugin('declaracad.editor')
+    handler = getattr(editor, name)
+    handler(event)
+
+
+def open_file(event):
+    ui = event.workbench.get_plugin('enaml.workbench.ui')
+    plugin = event.workbench.get_plugin('declaracad.editor')
+    path = event.parameters.get('path', '')
+    if not path:
+        path = FileDialogEx.get_open_file_name(
+            ui.window,
+            current_path=plugin.last_path,
+            name_filters=['*.enaml','*.py','*.c','*.cpp', '*.*'])
+        plugin.last_path = os.path.dirname(path)
+    if path:
+        event.parameters['path'] = path
+        plugin.open_file(event)
+
+def new_file(event):
+    ui = event.workbench.get_plugin('enaml.workbench.ui')
+    plugin = event.workbench.get_plugin('declaracad.editor')
+    with enaml.imports():
+        from declaracad.plugins.editor.views.dialogs import NewFileDialog
+
+    NewFileDialog(ui.window, plugin=plugin, event=event).exec_()
+
+
+def save_file(event):
+    ui = event.workbench.get_plugin('enaml.workbench.ui')
+    plugin = event.workbench.get_plugin('declaracad.editor')
+    if plugin.active_document.name:
+        return plugin.save_file(event)
+    else:
+        return save_file_as(event)
+
+
+def save_file_as(event):
+    ui = event.workbench.get_plugin('enaml.workbench.ui')
+    plugin = event.workbench.get_plugin('declaracad.editor')
+    path = FileDialogEx.get_save_file_name(
+        ui.window, current_path=os.path.dirname(plugin.active_document.name))
+    if path:
+        event.parameters['path'] = path
+        plugin.save_file_as(event)
+
+
+def open_settings(event):
+    ui = event.workbench.get_plugin('enaml.workbench.ui')
+    plugin = event.workbench.get_plugin('declaracad.editor')
+    with enaml.imports():
+        from .views.api import SettingsDialog
+
+    SettingsDialog(ui.window, plugin=plugin, event=event).exec_()
+
+
+def plugin_factory():
+    from .plugin import EditorPlugin
+    return EditorPlugin()
+
+
+def get_examples():
+    """ Get all examples matching examples/*/*.py """
+    examples = OrderedDict()
+    py_files = [f.replace("\\","/").split("/")[1:] for
+                  f in glob('examples/**/*.enaml', recursive=True)]
+    for path in sorted(py_files):
+        folders = path[:-1]
+        folder = ''
+        if len(path)>1:
+            #: Need to add all folders one at a time to make sure
+            #: menu items for each are created exactly once
+            #: Ex. examples/pyb/01-Bla will create the keys in order
+            #: ['examples','examples/pyb','examples/pyb/01-Bla']
+            for i in range(len(folders)):
+                subfolder = folders[i]
+                if folder:
+                    folder = "{}/{}".format(folder,subfolder)
+                else:
+                    folder = subfolder
+                if folder not in examples:
+                    examples[folder] = []
+        else:
+             if folder not in examples:
+                examples[folder] = []
+
+        examples[folder].append("/".join(path))
+    print(examples)
+    return examples
+
+def plugin_factory():
+    from .plugin import EditorPlugin
+    return EditorPlugin()
+
+
+def item_factory():
+    with enaml.imports():
+        from .view import EditorDockItem
+    return EditorDockItem
+
+def errors_item_factory():
+  with enaml.imports():
+    from .view import ErrorsDockItem
+  return ErrorsDockItem
+
+enamldef EditorManifest(PluginManifest):
+    """ The manifest which is registered when the view is loaded.
+
+    This manifest contributes extra menu items to the menu bar.
+
+    """
+    id = 'declaracad.editor'
+    factory = plugin_factory
+    Extension:
+        id = 'items'
+        point = DOCK_ITEM_POINT
+        #: Make sure this comes after the viewer
+        rank = 100
+        DockItem:
+            plugin_id = 'declaracad.editor'
+            factory = item_factory
+            layout = 'main'
+        DockItem:
+            plugin_id = 'declaracad.editor'
+            factory = errors_item_factory
+            layout = 'left'
+    Extension:
+        id = 'autostart'
+        point = 'enaml.workbench.ui.autostart'
+        Autostart:
+            plugin_id = 'declaracad.editor'
+    Extension:
+        id = 'commands'
+        point = 'enaml.workbench.core.commands'
+        Command:
+            id = 'declaracad.editor.close_file'
+            handler = lambda event:plugin_command('close_file', event)
+        Command:
+            id = 'declaracad.editor.save_file'
+            handler = save_file
+        Command:
+            id = 'declaracad.editor.save_file_as'
+            handler = save_file_as
+        Command:
+            id = 'declaracad.editor.new_file'
+            handler = new_file
+        Command:
+            id = 'declaracad.editor.open_file'
+            handler = open_file
+        Command:
+            id = 'declaracad.editor.open_settings'
+            handler = open_settings
+    
+    Extension:
+        id = 'actions'
+        point = 'enaml.workbench.ui.actions'
+        ActionItem:
+            path = '/file/new'
+            label = 'New'
+            shortcut = 'Ctrl+N'
+            group = 'user'
+            command = 'declaracad.editor.new_file'
+        ActionItem:
+            path = '/file/open'
+            label = 'Open'
+            shortcut = 'Ctrl+O'
+            group = 'user'
+            command = 'declaracad.editor.open_file'
+        ActionItem:
+            path = '/file/close'
+            label = 'Close'
+            shortcut = 'Ctrl+W'
+            group = 'document'
+            command = 'declaracad.editor.close_file'
+        ActionItem:
+            path = '/file/save'
+            enabled << bool(workbench and workbench.get_plugin("declaracad.editor").active_document)
+            label = 'Save'
+            shortcut = 'Ctrl+S'
+            group = 'document'
+            command = 'declaracad.editor.save_file'
+        ActionItem:
+            path = '/file/save_as'
+            enabled << bool(workbench and workbench.get_plugin("declaracad.editor").active_document)
+            label = 'Save As'
+            shortcut = 'Ctrl+Shift+S'
+            group = 'document'
+            command = 'declaracad.editor.save_file_as'
+        MenuItem:
+            path = '/examples'
+            label = 'Examples'
+            after = 'file'
+            before = 'settings'
+            ItemGroup:
+                id = 'examples'
+
+        Looper:
+            iterable = get_examples().items()
+            Conditional:
+                condition << bool(loop_item[0])
+                MenuItem:
+                    path = '/examples/{}'.format(loop_item[0].replace(" ",'-'))
+                    label = loop_item[0].split("/")[-1]
+                    group = 'examples' if len(loop_item[0].split("/")) == 0 else ""
+            Looper:
+                iterable = loop_item[1]
+                ActionItem:
+                    attr filename = loop_item.split("/")[-1]
+                    path = '/examples/{}'.format(loop_item.replace(" ",'-'))
+                    label = filename
+                    command = 'declaracad.editor.open_file'
+                    parameters = {'path': 'examples/{}'.format(loop_item), 'name': 'main.py'}
+            # MenuItem:
+            #     path = '/tools'
+            #     label = 'Tools'
+            #     before = 'workspace'
+        ActionItem:
+            path = '/settings/editor'
+            label = 'Editor...'
+            shortcut = 'Ctrl+Alt+S'
+            command = 'declaracad.editor.open_settings'

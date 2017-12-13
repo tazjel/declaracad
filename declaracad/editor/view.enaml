@@ -1,0 +1,167 @@
+"""
+Copyright (c) 2017, Jairus Martin.
+
+Distributed under the terms of the GPL v3 License.
+
+The full license is in the file LICENSE, distributed with this software.
+
+Created on Dec 10, 2015
+
+@author: jrm
+"""
+import os
+from enaml.widgets.api import  Container, Timer, MultilineField
+from declaracad.core.api import DockItem
+from enaml.scintilla.api import Scintilla, ScintillaIndicator, ScintillaMarker
+from enaml.scintilla.themes import THEMES
+from declaracad.core.utils import load_icon
+
+#from micropyde.plugins.editor.views.themes import THEMES
+from declaracad.core.utils import load_image
+
+
+def format_title(docs, doc, path, unsaved):
+    """ Attempt to format the title using the shortest unique name that
+    does not conflict with any other opened documents.
+
+    Based on Intellij's naming styles
+    """
+    if not path:
+        return "Untitled*"
+    path, name = os.path.split(path)
+
+    #: Find any others with the same name
+    duplicates = [d.name for d in docs
+                    if d != doc and os.path.split(d.name)[-1] == name]
+
+    #: Add folders until it becomes unique we run out of folders
+    if duplicates:
+        sep = os.path.sep
+        parts = path.split(sep)
+        for i in reversed(range(len(parts))):
+            tmp_name = sep.join(parts[i:])
+
+            #: See if there's still duplicates
+            duplicates = [d for d in duplicates if d.endswith(tmp_name)]
+            if not duplicates:
+                name = tmp_name
+                break
+
+        #: Give up
+        if duplicates:
+            name += "({})".format(len(duplicates))
+
+    if unsaved:
+        name += "*"
+    return name
+
+
+def detect_syntax(path):
+    p, ext = os.path.splitext(path)
+    file_type = ext[1:]
+    SYNTAXES = Scintilla.syntax.items
+    if file_type in SYNTAXES:
+        return file_type
+    elif file_type in ['py', 'pyx']:
+        return 'python'
+    elif file_type in ['js', 'ts', 'jsx']:
+        return 'javascript'
+    elif file_type in ['ino']:
+        return 'cpp'
+    elif file_type in ['sh']:
+        return 'bash'
+
+
+def create_indicators(errors):
+    results = []
+    try:
+        for e in errors:
+            tag = e.split(":")[0:3]
+            if len(tag) < 2:
+                continue
+            try:
+                l = int(tag[1])
+            except ValueError:
+                continue
+
+            color = "#FF0000"
+            try:
+                c = int(tag[2])
+                start = (l-1, 0)
+                stop = (l-1, c)
+            except ValueError:
+                start = (l-1, 0)
+                stop = (l, 0)
+                color = "#FFFF00"
+
+            results.append(ScintillaIndicator(
+                start=start, stop=stop, style="squiggle", color=color,
+            ))
+    except Exception as e:
+        print(e)
+    return results
+
+
+enamldef Editor(Container): view:
+    padding = 0
+    alias editor
+    attr plugin
+    attr model << plugin.active_document
+    Scintilla: editor:
+        hug_height = 'ignore'
+        hug_width = 'ignore'
+        syntax = 'enaml'#detect_syntax(model.name)
+        theme  << THEMES[plugin.theme] if plugin else THEMES['tango']
+        settings = {
+            "tab_width": 4,
+            "use_tabs": False,
+            "indent": 4,
+            "tab_indents": True,
+            "auto_indent": True,
+            "backspace_unindents": True,
+            "autocompletion_threshold": 1,
+            "autocompletion_case_sensitive": True,
+            "show_line_numbers": True,
+        }
+        autocomplete = 'all'
+        activated :: set_text(model.source) if model else None
+        text_changed :: timer.start()
+        zoom << plugin.zoom if plugin else 0
+        indicators << create_indicators(model.errors) if model else []
+        markers << [ScintillaMarker(
+                        line=i.start[0],
+                        image=load_image("exclamation" if i.color=="#FF0000"
+                                         else "error"))
+                        for i in indicators]
+        #warnings
+        Timer: timer:
+            interval = 350
+            single_shot = True
+            timeout ::
+                model.cursor = editor.cursor_position
+                model.source = editor.get_text()
+                editor.autocompletions = model.suggestions
+
+
+
+enamldef EditorDockItem(DockItem): view:
+    attr doc = plugin.active_document
+    title << format_title(plugin.documents, doc, doc.name, doc.unsaved)
+    closed ::
+        core = plugin.workbench.get_plugin("enaml.workbench.core")
+        core.invoke_command('declaracad.editor.close_file',
+                            {'path':doc.name})
+    icon = load_icon('script_code')
+    name << 'editor-item-{}'.format(doc.name)
+    Editor:
+        minimum_size = (480, 320)
+        plugin << view.plugin
+        model << view.doc
+
+
+enamldef ErrorsDockItem(DockItem):
+  title = "Errors"
+  name = 'errors-item'
+  Container:
+    MultilineField:
+        text << "\n".join(plugin.active_document.errors)

@@ -1,0 +1,16 @@
+from enaml.core.api import Looper
+from declaracad.occ.algo import Transform
+from declaracad.occ.shape import Revol, Face
+from declaracad.occ.draw import Segment, Wire, Point
+from declaracad.occ.part import Part
+import math
+
+enamldef Assembly(Part): 
+    name = "Ribs"
+    Bit:
+        length = 40
+        translate = (-10,-10,0)
+        angle = math.pi/3
+                
+    
+

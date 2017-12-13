@@ -1,0 +1,44 @@
+"""
+Copyright (c) 2017, Jairus Martin.
+
+Distributed under the terms of the GPL v3 License.
+
+The full license is in the file LICENSE, distributed with this software.
+
+Created on Dec 13, 2017
+
+@author: jrm
+"""
+from enaml.core.include import Include
+from enaml.layout.api import AreaLayout, TabLayout, DockBarLayout, HSplitLayout
+from declaracad.core.api import DockArea, DockItem
+from enaml.widgets.dock_events import DockItemEvent
+
+
+enamldef DockView(DockArea):
+    attr workbench
+    attr plugin
+    name = 'dock_area'
+    layout << plugin.dock_layout
+#    dock_events_enabled = True
+#    dock_event::
+#        event = change['value']
+#        if event.type==DockItemEvent.TabSelected:
+#            if event.name.startswith('viewer'):
+#                self.find(event.name).resize()
+                    #print event.name,event.type
+    dock_events_enabled = True
+    dock_event ::
+        event = change['value']
+        plugin = workbench.get_plugin('declaracad.editor')
+        #: Update the active document
+        if event.type == DockItemEvent.Type.Shown \
+                and 'editor-item-' in event.name:
+            path = event.name.split("editor-item-")[-1]
+            matches = [d for d in plugin.documents if d.name==path]
+            if matches:
+                plugin.active_document = matches[0]
+        else:
+            plugin.save_dock_area(change)
+    Include:
+        objects << plugin.dock_items

@@ -1,0 +1,57 @@
+"""
+Copyright (c) 2017, Jairus Martin.
+
+Distributed under the terms of the GPL v3 License.
+
+The full license is in the file LICENSE, distributed with this software.
+
+Created on Dec 6, 2017
+
+@author: jrm
+"""
+import enaml
+from enaml.workbench.api import Extension, PluginManifest
+from enaml.workbench.core.api import Command
+from declaracad.ui.extensions import DOCK_ITEM_POINT, DockItem
+
+
+def plugin_command(name, event):
+    editor = event.workbench.get_plugin('declaracad.viewer')
+    handler = getattr(editor, name)
+    handler(event)
+
+
+def plugin_factory():
+    from .plugin import ViewerPlugin
+    return ViewerPlugin()
+
+def item_factory():
+    with enaml.imports():
+        from .view import ViewerDockItem
+    return ViewerDockItem
+
+
+enamldef ViewerManifest(PluginManifest):
+    """ The manifest which is registered when the view is loaded.
+
+    This manifest contributes extra menu items to the menu bar.
+
+    """
+    id = 'declaracad.viewer'
+    factory = plugin_factory
+
+    Extension:
+      id = 'commands'
+      point = 'enaml.workbench.core.commands'
+      Command:
+        id = 'declaracad.viewer.fit_all'
+        handler = lambda event:plugin_command('fit_all', event)
+
+    Extension:
+        id = 'items'
+        point = DOCK_ITEM_POINT
+        DockItem:
+            plugin_id = 'declaracad.viewer'
+            factory = item_factory
+            layout = 'main'
+
