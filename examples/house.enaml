@@ -31,7 +31,7 @@ def angle(p0,p1):
     d.Rotate(ax,a)
     
     p = (d.X(),d.Y(),d.Z())
-    print dx,dy,a,p
+    print(dx,dy,a,p)
     #print dx,dy
     #dmax = max(dx,dy)
     #d = d.Crossed(gp_Dir(abs(dy),abs(dx),0))

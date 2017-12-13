@@ -1,13 +1,13 @@
 
 from enaml.core.api import Looper
-from occ.shape import Box, Sphere 
-from occ.algo import Cut
-from occ.part import Part
+from declaracad.occ.shape import Box, Sphere 
+from declaracad.occ.algo import Cut
+from declaracad.occ.part import Part
 
-enamldef TurnersCube(Part):
+enamldef Assembly(Part):
     name = "Turners Cube"
     
-    attr levels: int = 3
+    attr levels: int = 13
     Looper:
         iterable << range(1,1+levels)
         Cut:
@@ -17,4 +17,4 @@ enamldef TurnersCube(Part):
                 dy = loop_item
                 dz = loop_item
             Sphere:
-                radius = loop_item/1.5 
+                radius = loop_item/1.5

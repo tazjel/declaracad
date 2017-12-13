@@ -1,8 +1,8 @@
 import traceback
 
-from occ.shape import Box, Cone, Cylinder, Sphere 
-from occ.part import Part
-from occ.algo import Cut, Common, Fillet, ThickSolid, Chamfer
+from declaracad.occ.shape import Box, Cone, Cylinder, Sphere 
+from declaracad.occ.part import Part
+from declaracad.occ.algo import Cut, Common, Fillet, ThickSolid, Chamfer
 
 from OCC.BRep import BRep_Tool
 from OCC._Geom import Handle_Geom_Plane_DownCast
@@ -17,7 +17,7 @@ def top_face(f):
         traceback.print_exc()
         return 0
 
-enamldef Operations(Part):
+enamldef Assembly(Part):
     name = "Shape Operations"
     Cut:
         Box: box1:

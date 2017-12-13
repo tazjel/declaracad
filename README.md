@@ -8,8 +8,10 @@ in that it's all parts are intended to be defined programatically. However the
 language being used is enaml (a superset of python).  Python developers will find
 this very easy and intuitive.
 
+[![Declaracad preview](https://img.youtube.com/vi/SeVcerBlpWE/0.jpg)](https://youtu.be/SeVcerBlpWE)
 
-See [the project site](https://www.codelv.com/projects/declaracad/) or look at the examples.
+
+See [the project site](https://www.codelv.com/projects/declaracad/) (coming soon).
 
 
 ## Features
