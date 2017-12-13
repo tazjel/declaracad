@@ -4,9 +4,9 @@ A declarative parametric 3D modeling program built using [OpenCascade](https://g
 and [enaml](https://github.com/nucleic/enaml/). 
 
 It's similar to [OpenSCAD](http://www.openscad.org/)
-in that it's all parts are intended to be defined programatically. However the 
-language being used is enaml (a superset of python).  Python developers will find
-this very easy and intuitive.
+in that everything is intended to be defined programatically. However the 
+language being used is enaml (a superset of python) instead of javascript.  
+Python users/developers will find this very easy and intuitive.
 
 [![Declaracad preview](https://img.youtube.com/vi/SeVcerBlpWE/0.jpg)](https://youtu.be/SeVcerBlpWE)
 
@@ -22,11 +22,11 @@ Currently the following 3D features can be used:
 2. Boolean operations (Cut, Fuse, Common) see [algo](declaracad/occ/algo.py)
 3. Fillet and chamfer edges see [algo](declaracad/occ/algo.py)
 4. Drawing of wires and faces see [draw](declaracad/occ/draw.py)
-4. Pipes 
-5. LinearForm, RevolutionForm
-5. ThickSolid, ThroughSections
+4. Pipes [algo](declaracad/occ/algo.py)
+5. LinearForm, RevolutionForm [algo](declaracad/occ/algo.py)
+5. ThickSolid, ThroughSections [algo](declaracad/occ/algo.py)
 
-See the [examples](examples) for demos.
+See the [examples](examples) and the [occ](declaracad/occ/) package.
 
 
 ## Example
@@ -59,7 +59,8 @@ enamldef TurnersCube(Part):
 
 ## Installing
 
-There is currently no installer as it's in pre-alpha state. To use it:
+There is currently no installer as it's in pre-alpha state. It runs on windows and linux 
+(have not yet tested osx but it should also work). To use it:
 
 ```bash
 
