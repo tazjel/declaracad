@@ -1,6 +1,6 @@
-
-from declaracad.occ.part import Part
-from declaracad.occ.draw import Wire, Circle, Ellipse, Line, Point, Polygon
+from declaracad.occ.api import (
+    Part, Wire, Circle, Ellipse, Line, Point, Polygon
+)
 
 enamldef Assembly(Part):
     name = "Draw Example"

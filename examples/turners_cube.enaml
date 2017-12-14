@@ -1,13 +1,13 @@
 
 from enaml.core.api import Looper
-from declaracad.occ.shape import Box, Sphere 
-from declaracad.occ.algo import Cut
-from declaracad.occ.part import Part
+from declaracad.occ.api import (
+    Box, Sphere , Cut, Part
+)
 
 enamldef Assembly(Part):
     name = "Turners Cube"
     
-    attr levels: int = 13
+    attr levels: int = 3
     Looper:
         iterable << range(1,1+levels)
         Cut:

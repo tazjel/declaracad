@@ -1,8 +1,8 @@
-from declaracad.occ.shape import Cylinder, Prism, Face
-from declaracad.occ.draw import Segment, Arc, Wire, Point
-from declaracad.occ.algo import Fuse, ThickSolid, Fillet, Transform
-from declaracad.occ.part import Part
-#from occ.axis import XAxis
+from declaracad.occ.api import (
+    Cylinder, Prism, Face, Segment, Arc, Wire, Point,
+    Fuse, ThickSolid, Fillet, Transform, Part
+)
+
 
 enamldef Assembly(Part): part:
     name = "Bottle"

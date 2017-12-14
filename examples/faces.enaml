@@ -1,8 +1,9 @@
-from enaml.core.api import Looper
-from declaracad.occ.shape import Face
-from declaracad.occ.draw import Segment, Wire, Point, Arc, Circle
-from declaracad.occ.part import Part
 import math
+from enaml.core.api import Looper
+from declaracad.occ.api import (
+    Face, Segment, Wire, Point, Arc, Circle, Part
+)
+
 
 enamldef Assembly(Part): 
     name = "Faces"

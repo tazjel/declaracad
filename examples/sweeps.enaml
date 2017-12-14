@@ -1,9 +1,9 @@
-from enaml.core.api import Looper
-from declaracad.occ.algo import Transform
-from declaracad.occ.shape import Revol, Face
-from declaracad.occ.draw import Segment, Wire, Point
-from declaracad.occ.part import Part
 import math
+from enaml.core.api import Looper
+from declaracad.occ.api import (
+    Transform, Revol, Face, Segment, Wire, Point, Part
+)
+
 
 enamldef Bit(Transform): bit:
     attr length = 30 # Todo

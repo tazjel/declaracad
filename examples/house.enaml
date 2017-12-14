@@ -1,12 +1,11 @@
 import math
 from enaml.core.api import Looper, Conditional
-from declaracad.occ.shape import Box, Prism, Face
-from declaracad.occ.draw import Segment, Arc, Wire, Point
-from declaracad.occ.algo import Cut, Fuse, Offset, Fillet, Transform, ThickSolid, Pipe
-from declaracad.occ.part import Part
+from declaracad.occ.api (
+    Box, Prism, Face, Segment, Arc, Wire, Point, Part,
+    Cut, Fuse, Offset, Fillet, Transform, ThickSolid, Pipe,
+)
 from OCC.gp import gp_Dir, gp_Ax1, gp_Pnt
 from OCC.gce import gce_MakeDir
-
 
 def inch(ft):
     return ft/12.0

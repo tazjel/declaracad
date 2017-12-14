@@ -1,9 +1,7 @@
 from enaml.core.api import Looper
-from declaracad.occ.algo import ThruSections, Cut
-from declaracad.occ.draw import Wire, Circle
-from declaracad.occ.part import Part
-import math
-
+from declaracad.occ.api import (
+    ThruSections, Cut, Wire, Circle, Part
+)
               
 enamldef Assembly(Part): 
     name = "ThruSections"

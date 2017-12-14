@@ -1,9 +1,8 @@
 import math
 from enaml.core.api import Looper
-from declaracad.occ.shape import (
-    Box, Cone, Cylinder, Sphere, Wedge, Torus 
+from declaracad.occ.api import (
+    Box, Cone, Cylinder, Sphere, Wedge, Torus, Part
 )
-from declaracad.occ.part import Part
 
 enamldef Assembly(Part):
     name = "Primative Shapes"

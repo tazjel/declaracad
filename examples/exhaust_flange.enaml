@@ -1,7 +1,7 @@
 from enaml.core.api import Looper
-from declaracad.occ.part import Part
-from declaracad.occ.algo import Fillet, Cut 
-from declaracad.occ.shape import Cylinder, Box
+from declaracad.occ.api import (
+    Part, Fillet, Cut, Cylinder, Box
+)
 
 enamldef Assembly(Part):
     name = "Exhaust Flange"
