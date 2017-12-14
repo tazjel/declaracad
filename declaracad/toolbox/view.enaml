@@ -34,10 +34,12 @@ enamldef ToolboxDockItem(DockItem):
                 TreeViewItem:
                     text = loop_item.name
                     tool_tip = loop_item.doc
-                    items = [m for n, m in loop_item.item.members().items()
-                                    if not n.startswith("_")]
+                    items = sorted([m for n, m in loop_item.item.members().items()
+                                    if not n.startswith("_")], key=lambda m:m.name)
                     TreeViewColumn:
-                        text = ""
+                        attr base = loop_item.item.__bases__[0]
+                        text = base.__name__
+                        tool_tip = inspect.getdoc(base)
                     Looper:
                         iterable << parent.items
                         TreeViewItem:
@@ -45,7 +47,7 @@ enamldef ToolboxDockItem(DockItem):
                             tool_tip = inspect.getdoc(loop_item)
                             TreeViewColumn:
                                 text = loop_item.__class__.__name__
-                                tool_tip = ("\n".format(loop_item.items)
+                                tool_tip = ("\n".join(map(str,loop_item.items))
                                                 if isinstance(loop_item, Enum) else "")
 
 
