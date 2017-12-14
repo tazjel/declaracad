@@ -12,18 +12,27 @@ Created on Dec 6, 2017
 import enaml
 from enaml.workbench.api import Extension, PluginManifest
 from enaml.workbench.core.api import Command
+from enaml.workbench.ui.api import ActionItem
+from enaml.widgets.api import FileDialogEx
 from declaracad.ui.extensions import DOCK_ITEM_POINT, DockItem
 
 
 def plugin_command(name, event):
-    editor = event.workbench.get_plugin('declaracad.viewer')
-    handler = getattr(editor, name)
+    plugin = event.workbench.get_plugin('declaracad.viewer')
+    handler = getattr(plugin, name)
     handler(event)
 
+def export(event):
+    ui = event.workbench.get_plugin('enaml.workbench.ui')
+    plugin = event.workbench.get_plugin('declaracad.viewer')
+    with enaml.imports():
+        from .dialogs import ExportStlDialog
+    ExportStlDialog(ui.window, plugin=plugin, event=event).exec_()
 
 def plugin_factory():
     from .plugin import ViewerPlugin
     return ViewerPlugin()
+
 
 def item_factory():
     with enaml.imports():
@@ -44,8 +53,11 @@ enamldef ViewerManifest(PluginManifest):
       id = 'commands'
       point = 'enaml.workbench.core.commands'
       Command:
-        id = 'declaracad.viewer.fit_all'
-        handler = lambda event:plugin_command('fit_all', event)
+          id = 'declaracad.viewer.fit_all'
+          handler = lambda event:plugin_command('fit_all', event)
+      Command:
+          id = 'declaracad.viewer.export'
+          handler = lambda event:plugin_command('export', event)
 
     Extension:
         id = 'items'
@@ -54,4 +66,13 @@ enamldef ViewerManifest(PluginManifest):
             plugin_id = 'declaracad.viewer'
             factory = item_factory
             layout = 'main'
+
+    Extension:
+        id = 'menu'
+        point = 'enaml.workbench.ui.actions'
+        ActionItem:
+            path = '/file/export'
+            label = 'Export...'
+            group = 'document'
+            command = 'declaracad.viewer.export'
 

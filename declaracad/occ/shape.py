@@ -5,7 +5,7 @@ Created on Sep 30, 2016
 """
 from atom.api import (
     Tuple, Instance, Bool, Str, Float, Property, Coerced, Typed, ForwardTyped, 
-    observe
+    Enum, observe
 )
 
 from contextlib import contextmanager
@@ -195,7 +195,15 @@ class Shape(ToolkitObject):
     tolerance = d_(Float(10**-6, strict=False))
     
     #: Color
-    color = d_(Str()).tag(view=True, group='Display')#Instance((basestring,Quantity_Color)))
+    color = d_(Str()).tag(view=True, group='Display')
+
+    #: Texture material
+    material = d_(Enum(None, 'aluminium', 'brass', 'bronze', 'charcoal',
+                       'chrome', 'copper', 'default', 'diamond', 'glass',
+                       'gold', 'jade', 'metalized', 'neon_gnc', 'neon_phc',
+                       'obsidian', 'pewter', 'plaster', 'plastic', 'satin',
+                       'shiny_plastic', 'silver', 'steel', 'stone', 'water')
+                  ).tag(view=True, group='Display')
     
     #: Transparency
     transparency = d_(Float(strict=False)).tag(view=True, group='Display')

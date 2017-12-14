@@ -1,0 +1,76 @@
+#------------------------------------------------------------------------------
+"""
+Copyright (c) 2017, Jairus Martin.
+
+Distributed under the terms of the GPL v3 License.
+
+The full license is in the file LICENSE, distributed with this software.
+
+Created on Dec 13, 2017
+
+@author: jrm
+"""
+import os
+import sys
+if sys.platform == 'win32':
+    from enaml import winutil
+from enaml.layout.api import align, hbox, spacer
+from enaml.core.api import Conditional
+from enaml.stdlib.dialog_buttons import DialogButtonBox, DialogButton
+from enaml.stdlib.task_dialog import (
+    TaskDialogBody, TaskDialogCommandArea,
+    TaskDialogContentArea, TaskDialogDetailsArea, TaskDialogFootnoteArea,
+    TaskDialogIconArea, TaskDialogInstructionArea, TaskDialogStyleSheet
+)
+from enaml.widgets.api import (
+    Dialog, Field, Label, PushButton, RadioButton, CheckBox, Html,
+    ProgressBar, ObjectCombo, Form, Container, SpinBox, FileDialogEx
+)
+from serial.tools.list_ports import comports
+from twisted.internet.protocol import ProcessProtocol
+from twisted.internet.defer import Deferred
+from ..plugin import EditorPlugin
+
+
+enamldef ExportStlDialog(Dialog): dialog:
+    title = 'Export model'
+    initial_size = (640, 320)
+    attr plugin
+    attr event
+    TaskDialogStyleSheet:
+            pass
+    TaskDialogBody:
+        TaskDialogInstructionArea:
+            Label:
+                style_class = 'task-dialog-instructions'
+                text = 'Export to stl'
+        TaskDialogContentArea:
+            Label:
+                style_class = 'task-dialog-content'
+                text = 'Enter the new file name'
+            Form:
+                Label:
+                    text = "Name"
+                Field: file_name:
+                    submit_triggers = ['auto_sync']
+            Label:
+                text = "In {}".format(os.path.abspath(plugin.project_path))
+
+        TaskDialogCommandArea:
+            constraints = [
+                hbox(spacer, btn_yes, btn_no),
+                align('v_center', btn_yes, btn_no),
+            ]
+            PushButton: btn_no:
+                text = "Cancel"
+                clicked :: dialog.close()
+            PushButton: btn_yes:
+                text = "Save"
+                enabled << len(file_name.text) > 1
+                clicked ::
+                    event.parameters['path'] = file_name.text
+                    plugin.new_file(event)
+                    dialog.close()
+
+
+

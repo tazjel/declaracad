@@ -51,12 +51,33 @@ enamldef ModelViewer(OccViewer): viewer:
         Action:
             text = 'Fit all'
             triggered :: viewer.proxy.display.FitAll()
+        Action:
+            separator = True
+        Menu:
+            title = 'Display'
+            Looper:
+                iterable << viewer.get_member('display_mode').items
+                Action:
+                    text = loop_item.title()
+                    checked << viewer.display_mode == loop_item
+                    triggered :: viewer.display_mode = loop_item
+
+        Menu:
+            title = 'Selection'
+            Looper:
+                iterable << viewer.get_member('selection_mode').items
+                Action:
+                    text = loop_item.title()
+                    checked << viewer.selection_mode == loop_item
+                    triggered :: viewer.selection_mode = loop_item
+
         Menu:
             title = 'View'
             Looper:
                 iterable << viewer.get_member('view_mode').items
                 Action:
-                    text << loop_item
+                    text = loop_item.title()
+                    checked << viewer.view_mode == loop_item
                     triggered :: viewer.view_mode = loop_item
 
 

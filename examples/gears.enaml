@@ -205,12 +205,14 @@ enamldef HelicalGear(Transform): root:
 enamldef Assembly(Part): gear:
     name = "Gears"
     SawBlade:
+        color = 'black'
         degrees = 10
         translate = (5,5,0)
         
     CamGear:
+        material = 'aluminium'
         translate = (5,-5,0)
     
     HelicalGear:
-        pass
+        material = 'plastic'
     

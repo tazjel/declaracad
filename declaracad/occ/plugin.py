@@ -25,7 +25,7 @@ class ViewerPlugin(Plugin):
         if change['type'] == 'update':
             timed_call(500, self.fit_all)
 
-    def fit_all(self):
+    def fit_all(self, event=None):
         viewer = self.get_viewer()
         viewer.proxy.display.FitAll()
 
@@ -33,3 +33,9 @@ class ViewerPlugin(Plugin):
         ui = self.workbench.get_plugin('enaml.workbench.ui')
         area = ui.workspace.content.find('dock_area')
         return area.find('viewer-item').viewer
+
+    def export(self, event):
+        """ Export the current model to stl """
+        import os
+        from OCC.StlAPI import StlAPI_Writer
+        from OCC.BRepMesh import BRepMesh_IncrementalMesh

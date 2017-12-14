@@ -490,7 +490,6 @@ class Topology(object):
         return cnt
 
 
-
 class OccShape(ProxyShape):
     #: A reference to the toolkit shape created by the proxy.
     shape = Typed(BRepBuilderAPI_MakeShape)
@@ -551,13 +550,12 @@ class OccShape(ProxyShape):
             return None
     
     @observe('shape')
-    def update_topology(self,change):
+    def update_topology(self, change):
         if self.shape:
             self.topology = self._default_topology()
-            
-        
+
     @observe('shape')    
-    def update_display(self,change):
+    def update_display(self, change):
         self.parent().update_display(change)
         
     def set_direction(self, direction):

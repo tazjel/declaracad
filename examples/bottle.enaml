@@ -14,7 +14,7 @@ enamldef Assembly(Part): part:
     
     #: Actual shape
     ThickSolid:
-        color = '#333333'
+        material = 'diamond'
         # Hollows out the bottle
         #closing_faces << [neck.shape_faces[0]]
         offset << thickness/50.0

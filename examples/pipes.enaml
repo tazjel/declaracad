@@ -73,6 +73,6 @@ enamldef Assembly(Part):
     Pipe:
         #: Spline
         spline = path
-                    
+        material = 'chrome'
         #: Profile
         profile = pipe_profile

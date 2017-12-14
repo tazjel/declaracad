@@ -25,6 +25,7 @@ from enaml.qt.qt_control import QtControl
 from enaml.qt.qt_toolkit_object import QtToolkitObject
 from enaml.application import timed_call
 from OCC.BRepBuilderAPI import BRepBuilderAPI_MakeShape
+from OCC import Graphic3d
 
 log = logging.getLogger('declaracad')
 
@@ -639,8 +640,14 @@ class QtOccViewer(QtControl, ProxyOccViewer):
                     continue
                     
                 displayed_shapes[s] = shape
+
+                material = getattr(Graphic3d, 'Graphic3d_NOM_{}'.format(
+                    d.material.upper()
+                )) if d.material else None
+
                 ais_shape = display.DisplayShape(
-                    s, color=d.color, transparency=d.transparency,
+                    s, color=d.color, material=material,
+                    transparency=d.transparency,
                     update=update, fit=not self._displayed_shapes)
 
             self._displayed_shapes = displayed_shapes
