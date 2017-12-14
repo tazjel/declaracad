@@ -41,7 +41,7 @@ def window_factory(workbench):
 def workspace_factory(workbench):
     from declaracad.ui.workspace import DeclaracadWorkspace
     space = DeclaracadWorkspace()
-    space.window_title = 'Declaracad'
+    space.window_title = 'DeclaraCAD'
     return space
 
 

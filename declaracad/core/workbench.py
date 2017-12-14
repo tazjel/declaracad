@@ -20,7 +20,7 @@ class DeclaracadWorkbench(UIWorkbench):
     _instance = None
 
     #: For error messages
-    app_name = Unicode('Declaracad')
+    app_name = Unicode('DeclaraCAD')
 
     @classmethod
     def instance(cls):
