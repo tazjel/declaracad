@@ -87,8 +87,9 @@ enamldef ViewerDockItem(DockItem): view:
   alias viewer
   closable = False
   icon = load_icon("bricks")
+  stretch = 1
   Container: container:
-    padding = 0
-    ModelViewer: viewer:
-      Include:
-        objects << plugin.parts
+      padding = 0
+      ModelViewer: viewer:
+          Include:
+              objects << plugin.parts

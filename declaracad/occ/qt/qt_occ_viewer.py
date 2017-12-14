@@ -193,8 +193,7 @@ class QtBaseViewer(QtOpenGL.QGLWidget):
         return win_id
 
     def resizeEvent(self, event):
-        super(QtBaseViewer, self).resizeEvent(event)
-        print(event)
+        #super(QtBaseViewer, self).resizeEvent(event)
         if self._inited:
             self._display.OnResize()
 
@@ -440,9 +439,9 @@ class QtOccViewer(QtControl, ProxyOccViewer):
         self.widget = QtViewer3d(parent=self.parent_widget())
 
     def init_widget(self):
+        super(QtOccViewer, self).init_widget()
         d = self.declaration
         widget = self.widget
-        self.widget.setMinimumSize(960, 720)
 
         #: Create viewer
         widget._display = Display(widget.GetHandle())
@@ -457,7 +456,7 @@ class QtOccViewer(QtControl, ProxyOccViewer):
         self.set_view_mode(d.view_mode)
         self.set_antialiasing(d.antialiasing)
         self._update_raytracing_mode()
-        
+
         #: Setup callbacks
         display.register_select_callback(self.update_selection)
         self.update_selection()
