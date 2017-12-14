@@ -259,10 +259,6 @@ class QtViewer3d(QtBaseViewer):
             
             log.info(msg)
 
-    def resize(self, size):
-        print("RESIZE")
-        super(QtViewer3d, self).resize(size)
-
     def Test(self):
         if self._inited:
             self._display.Test()

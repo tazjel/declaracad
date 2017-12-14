@@ -182,7 +182,7 @@ def occ_part_factory():
 
 
 #: Part
-QT_FACTORIES.update({
+OCC_FACTOIRES = {
     'Part': occ_part_factory,
     'Face': occ_face_factory,
 
@@ -226,5 +226,8 @@ QT_FACTORIES.update({
     'Parabola': occ_parabola_factory,
     'Polygon': occ_polygon_factory,
     'Wire': occ_wire_factory,
-})
+}
+
+#: Install it
+QT_FACTORIES.update(OCC_FACTOIRES)
 
