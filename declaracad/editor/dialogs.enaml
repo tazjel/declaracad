@@ -1,0 +1,82 @@
+#------------------------------------------------------------------------------
+# Copyright (c) 2017 Jairus Martin
+#
+# Distributed under the terms of the GPL v3 License.
+#
+# The full license is in the file LICENSE, distributed with this software.
+#------------------------------------------------------------------------------
+import os
+import sys
+if sys.platform == 'win32':
+    from enaml import winutil
+from enaml.layout.api import align, hbox, spacer
+from enaml.core.api import Conditional
+from enaml.stdlib.dialog_buttons import DialogButtonBox, DialogButton
+from enaml.stdlib.task_dialog import (
+    TaskDialogBody, TaskDialogCommandArea,
+    TaskDialogContentArea, TaskDialogDetailsArea, TaskDialogFootnoteArea,
+    TaskDialogIconArea, TaskDialogInstructionArea, TaskDialogStyleSheet
+)
+from enaml.widgets.api import (
+    Dialog, Field, Label, PushButton, RadioButton, CheckBox, Html,
+    ProgressBar, ObjectCombo, Form, Container, SpinBox, FileDialogEx
+)
+from .plugin import EditorPlugin
+
+enamldef NewFileDialog(Dialog): dialog:
+    title = 'New File'
+    initial_size = (640, 320)
+    attr plugin
+    attr event
+    TaskDialogStyleSheet:
+            pass
+    TaskDialogBody:
+        TaskDialogInstructionArea:
+            Label:
+                style_class = 'task-dialog-instructions'
+                text = 'Create a new file'
+        TaskDialogContentArea:
+            Label:
+                style_class = 'task-dialog-content'
+                text = 'Enter the new file name'
+            Form:
+                Label:
+                    text = "Name"
+                Field: file_name:
+                    submit_triggers = ['auto_sync']
+                Label:
+                    text = "Folder"
+                Container:
+                    constraints = [
+                        hbox(f1, pb1)
+                    ]
+                    padding = 0
+                    Field: f1:
+                        read_only = True
+                        text << os.path.abspath(plugin.last_path)
+                    PushButton: pb1:
+                        text = "Browse"
+                        clicked ::
+                            path = FileDialogEx.get_existing_directory(dialog,
+                                current_path=plugin.last_path)
+                            if path:
+                                plugin.last_path = path
+
+        TaskDialogCommandArea:
+            constraints = [
+                hbox(spacer, btn_yes, btn_no),
+                align('v_center', btn_yes, btn_no),
+            ]
+            PushButton: btn_no:
+                text = "Cancel"
+                clicked :: dialog.close()
+            PushButton: btn_yes:
+                text = "Save"
+                enabled << len(file_name.text) > 1
+                clicked ::
+                    event.parameters['path'] = file_name.text
+                    plugin.new_file(event)
+                    dialog.close()
+
+
+

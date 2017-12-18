@@ -45,7 +45,7 @@ def new_file(event):
     ui = event.workbench.get_plugin('enaml.workbench.ui')
     plugin = event.workbench.get_plugin('declaracad.editor')
     with enaml.imports():
-        from declaracad.plugins.editor.views.dialogs import NewFileDialog
+        from declaracad.editor.dialogs import NewFileDialog
 
     NewFileDialog(ui.window, plugin=plugin, event=event).exec_()
 
