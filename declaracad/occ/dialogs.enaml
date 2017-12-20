@@ -12,6 +12,7 @@ Created on Dec 13, 2017
 """
 import os
 import sys
+import textwrap
 if sys.platform == 'win32':
     from enaml import winutil
 from enaml.layout.api import align, hbox, spacer
@@ -26,24 +27,23 @@ from enaml.widgets.api import (
     Dialog, Field, Label, PushButton, RadioButton, CheckBox, Html,
     ProgressBar, ObjectCombo, Form, Container, SpinBox, FileDialogEx
 )
-from serial.tools.list_ports import comports
-from twisted.internet.protocol import ProcessProtocol
-from twisted.internet.defer import Deferred
-from ..plugin import EditorPlugin
+from enamlx.widgets.api import DoubleSpinBox
+from .plugin import ExportOptions
 
 
-enamldef ExportStlDialog(Dialog): dialog:
+enamldef ExportDialog(Dialog): dialog:
     title = 'Export model'
     initial_size = (640, 320)
     attr plugin
     attr event
+    attr options: ExportOptions = ExportOptions()
     TaskDialogStyleSheet:
             pass
     TaskDialogBody:
         TaskDialogInstructionArea:
             Label:
                 style_class = 'task-dialog-instructions'
-                text = 'Export to stl'
+                text = 'Export model to STL'
         TaskDialogContentArea:
             Label:
                 style_class = 'task-dialog-content'
@@ -51,25 +51,78 @@ enamldef ExportStlDialog(Dialog): dialog:
             Form:
                 Label:
                     text = "Name"
-                Field: file_name:
-                    submit_triggers = ['auto_sync']
-            Label:
-                text = "In {}".format(os.path.abspath(plugin.project_path))
+                Container:
+                    constraints = [
+                        hbox(file_name, browse)
+                    ]
+                    padding = 0
+                    Field: file_name:
+                        submit_triggers = ['auto_sync']
+                        text << os.path.abspath(options.path)
+                        text ::
+                            path = change['value']
+                            if not path.endswith(".stl"):
+                                path += '.stl'
+                            options.path = path
+                    PushButton: browse:
+                        text = "Browse"
+                        clicked ::
+                            path = FileDialogEx.get_save_file_name(self,
+                                        current_path=options.path, name_filters=['*.stl'])
+                            if path:
+                                if not path.endswith(".stl"):
+                                    path += '.stl'
+                                options.path = path
+        TaskDialogDetailsArea: details:
+            visible = False
+            Form:
+                Label:
+                    text = "Linear deflection"
+                    tool_tip = "Lower means higher quality (1.0 low ... 0.05 high)"
+                DoubleSpinBox:
+                    value := options.linear_deflection
+                    minimum = 0.0000001
+                    single_step = 0.01
+                    maximum = 100
+                Label:
+                    text = "Angular deflection"
+                    tool_tip = "Lower means higher quality (1.0 low ... 0.05 high)"
+                DoubleSpinBox:
+                    value := options.angular_deflection
+                    minimum = 0.0000001
+                    single_step = 0.01
+                    maximum = 100
+                CheckBox:
+                    text = "Binary mode"
+                    tool_tip = "Export as binary (checked) or ascii (unchecked)"
+                    checked := options.binary
+                CheckBox:
+                    text = "Relative deflection"
+                    tool_tip = textwrap.dedent("""
+                    If checked, deflection used for discretization of each edge will be
+                    <lin_deflection> * <size of edge>. Deflection used for the faces will be the
+                    maximum deflection of their edges
+                    """).strip()
+
+                    checked := options.relative
 
         TaskDialogCommandArea:
             constraints = [
-                hbox(spacer, btn_yes, btn_no),
+                hbox(show_options, spacer, btn_yes, btn_no),
                 align('v_center', btn_yes, btn_no),
             ]
+            CheckBox: show_options:
+                text = "Show advanced"
+                checked := details.visible
             PushButton: btn_no:
                 text = "Cancel"
                 clicked :: dialog.close()
             PushButton: btn_yes:
-                text = "Save"
-                enabled << len(file_name.text) > 1
+                enabled << bool(options.path)
+                text = "Export"
                 clicked ::
-                    event.parameters['path'] = file_name.text
-                    plugin.new_file(event)
+                    event.parameters['options'] = options
+                    plugin.export(event)
                     dialog.close()
 
 

@@ -26,8 +26,9 @@ def export(event):
     ui = event.workbench.get_plugin('enaml.workbench.ui')
     plugin = event.workbench.get_plugin('declaracad.viewer')
     with enaml.imports():
-        from .dialogs import ExportStlDialog
-    ExportStlDialog(ui.window, plugin=plugin, event=event).exec_()
+        from .dialogs import ExportDialog
+    ExportDialog(ui.window, plugin=plugin, event=event).exec_()
+
 
 def plugin_factory():
     from .plugin import ViewerPlugin
@@ -57,7 +58,7 @@ enamldef ViewerManifest(PluginManifest):
           handler = lambda event:plugin_command('fit_all', event)
       Command:
           id = 'declaracad.viewer.export'
-          handler = lambda event:plugin_command('export', event)
+          handler = export
 
     Extension:
         id = 'items'

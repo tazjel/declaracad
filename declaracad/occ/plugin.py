@@ -10,10 +10,19 @@ Created on Dec 13, 2017
 
 @author: jrm
 """
-from atom.api import List
-from declaracad.core.api import Plugin
+import os
+from atom.api import List, Unicode, Float, Bool
+from declaracad.core.api import Plugin, Model
 from enaml.application import timed_call
 from .part import Part
+
+
+class ExportOptions(Model):
+    path = Unicode()
+    linear_deflection = Float(0.05, strict=False)
+    angular_deflection = Float(0.5, strict=False)
+    relative = Bool()
+    binary = Bool(False)
 
 
 class ViewerPlugin(Plugin):
@@ -36,6 +45,23 @@ class ViewerPlugin(Plugin):
 
     def export(self, event):
         """ Export the current model to stl """
-        import os
         from OCC.StlAPI import StlAPI_Writer
         from OCC.BRepMesh import BRepMesh_IncrementalMesh
+        #: TODO: All parts
+        options = event.parameters.get('options')
+        if not isinstance(options, ExportOptions):
+            return False
+
+        exporter = StlAPI_Writer()
+        exporter.SetASCIIMode(not options.binary)
+
+        for part in self.parts:
+            #: Must mesh the shape first
+            shape = part.shapes[0].proxy.shape.Shape()  #: TODO...
+            mesh = BRepMesh_IncrementalMesh(
+                shape, options.linear_deflection, options.relative,
+                options.angular_deflection
+            )
+            mesh.SetDeflection(options.linear_deflection)
+            mesh.Perform()
+            exporter.Write(shape, options.path)
