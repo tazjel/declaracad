@@ -109,20 +109,18 @@ class Document(Model):
 
 
 class EditorPlugin(Plugin):
-    #: Zoom
-    zoom = Int()
-
     #: Opened files
-    documents = ContainerList(Document)
-    active_document = Instance(Document, ())
-    last_path = Unicode(os.path.expanduser('~/'))
+    documents = ContainerList(Document).tag(config=True)
+    active_document = Instance(Document, ()).tag(config=True)
+    last_path = Unicode(os.path.expanduser('~/')).tag(config=True)
+    project_path = Unicode(os.path.expanduser('~/')).tag(config=True)
 
     #: Editor settings
-    theme = Enum('friendly', *THEMES.keys())
-    zoom = Int(0)  #: Relative to default
+    theme = Enum('friendly', *THEMES.keys()).tag(config=True)
+    zoom = Int(0).tag(config=True)  #: Relative to default
 
     #: Editor sys path
-    sys_path = List()
+    sys_path = List().tag(config=True)
     _area_saves_pending = Int()
 
     # -------------------------------------------------------------------------
@@ -223,6 +221,8 @@ class EditorPlugin(Plugin):
         return [Document()]
 
     def _default_active_document(self):
+        if not self.documents:
+            self.documents = self._default_documents()
         return self.documents[0]
 
     def new_file(self, event):
@@ -348,23 +348,10 @@ class EditorPlugin(Plugin):
     # Code inspection API
     # -------------------------------------------------------------------------
     def _default_sys_path(self):
-        """ Determine the micropython SDK sys path"""
-        results = [self.project_path, self.upy_lib_path, self.upy_path]
+        """ Determine the sys path"""
+        return [self.project_path]
 
-        #: Add from module ports
-        paths = glob('{}/ports/{}/modules/*.py'.format(self.upy_path,
-                                                       self.upy_board),
-                     recursive=True)
-        print(paths)
-        results += [os.path.dirname(s) for s in paths]
-
-        #: Add modules from libs
-        paths = glob('{}/**/setup.py'.format(self.upy_lib_path),
-                     recursive=True)
-        results += [os.path.dirname(s) for s in paths]
-        return list(set(results))
-
-    @observe('upy_path', 'upy_lib_path', 'project_path', 'upy_board')
+    @observe('project_path')
     def _refresh_sys_path(self, change):
         if change['type'] == 'update':
             self.sys_path = self._default_sys_path()
