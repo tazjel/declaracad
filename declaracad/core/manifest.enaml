@@ -76,6 +76,8 @@ enamldef DeclaracadManifest(PluginManifest):
                 id = 'user'
             ItemGroup:
                 id = 'document'
+            ItemGroup:
+                id = 'impexp'
 
         ActionItem:
             path = '/file/quit'
