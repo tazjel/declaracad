@@ -55,17 +55,13 @@ def about_declaracad(event):
                     'declaracad.workbench.core')).exec_()
 
 
-def open_webpage(page):
+def open_url(page):
     if sys.platform == 'win32':
         os.startfile(page)
     else:
         import subprocess
         cmd = "open" if sys.platform == "darwin" else "xdg-open"
         subprocess.call([cmd, page])
-
-def open_wiki(event):
-    plugin = event.workbench.get_plugin('declaracad.ui')
-    open_webpage(plugin.wiki_page)
 
 
 enamldef UIManifest(PluginManifest):
@@ -98,11 +94,8 @@ enamldef UIManifest(PluginManifest):
 #             id = 'declaracad.ui.redo'
 #             handler = redo
         Command:
-            id = 'declaracad.ui.about_declaracad'
-            handler = about_declaracad
-        Command:
-            id = 'declaracad.ui.open_wiki'
-            handler = open_wiki
+            id = 'declaracad.ui.open_url'
+            handler = lambda e:open_url(e.parameters.get('url'))
 
     Extension:
         id = 'autostart'
@@ -124,14 +117,22 @@ enamldef UIManifest(PluginManifest):
             command = 'declaracad.ui.open_preferences'
 
         ActionItem:
-            path = '/help/wiki'
-            label = 'Wiki'
-            command = 'declaracad.ui.open_wiki'
+            path = '/help/issues'
+            label = 'Report issue...'
+            command = 'declaracad.ui.open_url'
+            parameters = {'url': 'https://github.com/codelv/declaracad/issues'}
 
         ActionItem:
             path = '/help/about'
-            label = 'About'
-            command = 'declaracad.ui.about_declaracad'
+            label = 'About...'
+            command = 'declaracad.ui.open_url'
+            parameters = {'url': 'https://www.codelv.com/projects/declaracad/'}
+
+        ActionItem:
+            path = '/help/donate'
+            label = 'Donate...'
+            command = 'declaracad.ui.open_url'
+            parameters = {'url': 'https://www.codelv.com/projects/declaracad/support/'}
 
 #         ActionItem:
 #             path = '/edit/undo'
