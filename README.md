@@ -41,7 +41,6 @@ See the [examples](examples) and the [occ](declaracad/occ/) package.
 ![DeclaraCAD import from svg](https://user-images.githubusercontent.com/380158/34210286-5db22d4a-e563-11e7-9b86-6c2f5db73c96.gif)
 
 
-
 ## Example
 
 This is generates a turners cube of a given number of levels.
@@ -49,9 +48,7 @@ This is generates a turners cube of a given number of levels.
 ```python
 
 from enaml.core.api import Looper
-from declaracad.occ.shape import Box, Sphere
-from declaracad.occ.algo import Cut
-from declaracad.occ.part import Part
+from declaracad.occ.api import Box, Sphere, Cut, Part
 
 enamldef TurnersCube(Part):
     name = "Turners Cube"
@@ -103,3 +100,12 @@ git clone https://github.com/codelv/declaracad.git
 python main.py
 
 ```
+
+
+## License
+
+The application is released under the GPL v3 (due to the use of PyQt5 and QScintilla). 
+If you want to use this in your own application these can be replaced with alternatives if 
+alternate licensing is needed. Please [contact](https://www.codelv.com/contact/) me for more 
+details.
+
