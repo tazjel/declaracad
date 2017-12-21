@@ -30,9 +30,9 @@ See the [examples](examples) and the [occ](declaracad/occ/) package.
 
 ## Import / export
 
-- Currently there is no import support (it's possible to import but ideally everything is written in code)
-- Import 2D paths from SVG (ex Adobe Illustrator, Inkscape, etc..) can be imported and created used
-- Models can be exported to an stl file (see #1) but it's currently limited to one shape
+- Currently there is no import support from other 3d types (it's possible to import but ideally everything is written in code)
+- Importing 2D paths from SVG (ex Adobe Illustrator, Inkscape, etc..) works great
+- Models can be exported to an stl file
 
 ![DeclaraCAD export to stl](https://user-images.githubusercontent.com/380158/34184975-d911c43c-e4f0-11e7-88ca-b52e6557ae83.gif)
 

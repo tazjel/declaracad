@@ -211,12 +211,12 @@ class QtViewer3d(QtBaseViewer):
         self._selection = None
         self._drawtext = True
         self._callbacks = {
-            'key_press': [],
-            'drag': [],
-            'mouse_wheel': [],
-            'mouse_move': [],
-            'mouse_press': [],
-            'mouse_release': [],
+            'key_pressed': [],
+            'mouse_dragged': [],
+            'mouse_scrolled': [],
+            'mouse_moved': [],
+            'mouse_pressed': [],
+            'mouse_released': [],
         }
         #self.resize(960, 720)
         #self.setMinimumSize(960, 720)
@@ -249,14 +249,14 @@ class QtViewer3d(QtBaseViewer):
                          ord('G'): self._display.SetSelectionMode}
 
     def keyPressEvent(self, event):
-        if self._fireEventCallback('key_press', event):
+        if self._fireEventCallback('key_pressed', event):
             return
         code = event.key()
         if code in self._key_map:
             self._key_map[code]()
         else:
             msg = "key: {0}\nnot mapped to any function".format(code)
-            
+
             log.info(msg)
 
     def Test(self):
@@ -290,7 +290,7 @@ class QtViewer3d(QtBaseViewer):
         self._display.FitAll()
 
     def wheelEvent(self, event):
-        if self._fireEventCallback('mouse_wheel', event):
+        if self._fireEventCallback('mouse_scrolled', event):
             return
         try:  # PyQt4/PySide
             delta = event.delta()
@@ -304,7 +304,7 @@ class QtViewer3d(QtBaseViewer):
         self._display.ZoomFactor(zoom_factor)
 
     def dragMoveEvent(self, event):
-        if self._fireEventCallback('drag', event):
+        if self._fireEventCallback('mouse_dragged', event):
             return
         pass
     
@@ -324,13 +324,13 @@ class QtViewer3d(QtBaseViewer):
     def mousePressEvent(self, event):
         self.setFocus()
         self.dragStartPos = event.pos()
-        if self._fireEventCallback('mouse_press', event):
+        if self._fireEventCallback('mouse_pressed', event):
             return
         self._display.StartRotation(self.dragStartPos.x(),
                                     self.dragStartPos.y())
 
     def mouseReleaseEvent(self, event):
-        if self._fireEventCallback('mouse_release', event):
+        if self._fireEventCallback('mouse_released', event):
             return
         #pt = event.pos()
         modifiers = event.modifiers()
@@ -365,7 +365,7 @@ class QtViewer3d(QtBaseViewer):
         self.update()
 
     def mouseMoveEvent(self, event):
-        if self._fireEventCallback('mouse_move', event):
+        if self._fireEventCallback('mouse_moved', event):
             return
         pt = event.pos()
         buttons = int(event.buttons())
@@ -466,9 +466,8 @@ class QtOccViewer(QtControl, ProxyOccViewer):
         d = self.declaration
         widget = self.widget
         for name in widget._callbacks.keys():
-            event_name = 'on_{}'.format(name)
-            if hasattr(d, event_name):
-                cb = getattr(d, event_name)
+            if hasattr(d, name):
+                cb = getattr(d, name)
                 widget._callbacks[name].append(cb)
         
     def init_layout(self):
@@ -584,8 +583,8 @@ class QtOccViewer(QtControl, ProxyOccViewer):
             
     def update_display(self, change=None):
         self._update_count += 1
-        #log.debug('update_display')
-        timed_call(0, self._do_update)
+        log.debug('update_display')
+        timed_call(10, self._do_update)
         
     def clear_display(self):
         display = self.display
@@ -616,14 +615,17 @@ class QtOccViewer(QtControl, ProxyOccViewer):
 
             self.clear_display()
             displayed_shapes = {}
-            #log.error( "_do_update {}")
+            log.debug("_do_update {}")
+
+            #: Expand all parts otherwise we lose the material information
             shapes = self._expand_shapes(self.shapes[:])
+
             for shape in shapes:
-                update = shape == shapes[-1]
                 d = shape.declaration
                 if not shape.shape:
                     log.error("{} has no shape property!".format(shape))
                     continue
+
                 try:
                     if isinstance(shape.shape, BRepBuilderAPI_MakeShape):
                         s = shape.shape.Shape()
@@ -636,9 +638,13 @@ class QtOccViewer(QtControl, ProxyOccViewer):
                     
                 displayed_shapes[s] = shape
 
+                #: If a material is given
                 material = getattr(Graphic3d, 'Graphic3d_NOM_{}'.format(
                     d.material.upper()
                 )) if d.material else None
+
+                #: If last shape
+                update = shape == shapes[-1]
 
                 ais_shape = display.DisplayShape(
                     s, color=d.color, material=material,

@@ -8,12 +8,10 @@ from atom.api import (
 )
 from enaml.core.declarative import d_
 
-from .shape import Shape
-from enaml.widgets.control import ProxyControl
-from enaml.widgets.toolkit_object import ToolkitObject
+from .shape import Shape, ProxyShape
 
 
-class ProxyPart(ProxyControl):
+class ProxyPart(ProxyShape):
     #: A reference to the Shape declaration.
     declaration = ForwardTyped(lambda: Part)
     
@@ -21,7 +19,7 @@ class ProxyPart(ProxyControl):
         self.parent().update_display(change)
 
     
-class Part(ToolkitObject):
+class Part(Shape):
     """ A part is simply a group of shapes """
     #: Reference to the implementation control
     proxy = Typed(ProxyPart)

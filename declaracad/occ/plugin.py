@@ -16,6 +16,12 @@ from declaracad.core.api import Plugin, Model
 from enaml.application import timed_call
 from .part import Part
 
+from OCC.TopoDS import TopoDS_Compound
+from OCC.BRep import BRep_Builder
+
+class ExportError(Exception):
+    """ Raised if export failed """
+
 
 class ExportOptions(Model):
     path = Unicode()
@@ -55,13 +61,26 @@ class ViewerPlugin(Plugin):
         exporter = StlAPI_Writer()
         exporter.SetASCIIMode(not options.binary)
 
+        #: Make a compound of compounds (if needed)
+        compound = TopoDS_Compound()
+        builder = BRep_Builder()
+        builder.MakeCompound(compound)
         for part in self.parts:
             #: Must mesh the shape first
-            shape = part.shapes[0].proxy.shape.Shape()  #: TODO...
-            mesh = BRepMesh_IncrementalMesh(
-                shape, options.linear_deflection, options.relative,
-                options.angular_deflection
-            )
-            mesh.SetDeflection(options.linear_deflection)
-            mesh.Perform()
-            exporter.Write(shape, options.path)
+            if isinstance(part, Part):
+                builder.Add(compound, part.proxy.shape)
+            else:
+                builder.Add(compound, part.proxy.shape.Shape())
+
+        #: Build the mesh
+        mesh = BRepMesh_IncrementalMesh(
+            compound,
+            options.linear_deflection,
+            options.relative,
+            options.angular_deflection
+        )
+        mesh.Perform()
+        if not mesh.IsDone():
+            raise ExportError("Failed to create the mesh")
+
+        exporter.Write(compound, options.path)

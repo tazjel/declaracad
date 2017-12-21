@@ -112,11 +112,11 @@ class OccViewer(Control):
     
     #: Events
     #: Raise StopIteration to indicate handling should stop
-    on_key_press = d_(Event(), writable=False)
-    on_mouse_press = d_(Event(), writable=False)
-    on_mouse_release = d_(Event(), writable=False)
-    on_mouse_wheel = d_(Event(), writable=False)
-    on_mouse_move = d_(Event(), writable=False)
+    key_pressed = d_(Event(), writable=False)
+    mouse_pressed = d_(Event(), writable=False)
+    mouse_released = d_(Event(), writable=False)
+    mouse_wheeled = d_(Event(), writable=False)
+    mouse_moved = d_(Event(), writable=False)
 
     # -------------------------------------------------------------------------
     # Observers

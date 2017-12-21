@@ -31,12 +31,19 @@ from enamlx.widgets.api import DoubleSpinBox
 from .plugin import ExportOptions
 
 
+
+
 enamldef ExportDialog(Dialog): dialog:
     title = 'Export model'
     initial_size = (640, 320)
     attr plugin
     attr event
-    attr options: ExportOptions = ExportOptions()
+    attr options: ExportOptions = ExportOptions(path=load_name())
+
+    func load_name():
+        doc = plugin.workbench.get_plugin('declaracad.editor').active_document
+        return "{}.stl".format(os.path.splitext(doc.name)[0])
+
     TaskDialogStyleSheet:
             pass
     TaskDialogBody:
