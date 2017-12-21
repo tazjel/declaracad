@@ -20,19 +20,21 @@ Currently the following 3D features can be used:
 
 1. Basic shapes (Box, Sphere, Cylinder, Wedge, Torus) see [shapes](declaracad/occ/shape.py)
 2. Boolean operations (Cut, Fuse, Common) see [algo](declaracad/occ/algo.py)
-3. Fillet and chamfer edges see [algo](declaracad/occ/algo.py)
-4. Drawing of wires and faces see [draw](declaracad/occ/draw.py)
-4. Pipes [algo](declaracad/occ/algo.py)
-5. LinearForm, RevolutionForm [algo](declaracad/occ/algo.py)
-5. ThickSolid, ThroughSections [algo](declaracad/occ/algo.py)
+3. Fillet and Chamfer edges see [algo](declaracad/occ/algo.py)
+4. 2D Drawing of wires and faces see [draw](declaracad/occ/draw.py)
+5. Pipes [algo](declaracad/occ/algo.py)
+6. Extrude (Prism), LinearForm, RevolutionForm [algo](declaracad/occ/algo.py)
+7. ThickSolid, ThroughSections [algo](declaracad/occ/algo.py)
 
 See the [examples](examples) and the [occ](declaracad/occ/) package.
 
 ## Import / export
 
-- Currently there is no import support from other 3d types (it's possible to import but ideally everything is written in code)
-- Importing 2D paths from SVG (ex Adobe Illustrator, Inkscape, etc..) works great
-- Models can be exported to an stl file
+- Currently there is no import support from other 3d types 
+    (it's possible to import but ideally everything is written in code)
+- Importing 2D paths from SVG (ex Adobe Illustrator, Inkscape, etc..) works great 
+    (parser to be included soon #3)
+- Models can be exported to an stl file for imported into other programs (ex Simplify3D, FreeCAD, etc..)
 
 ![DeclaraCAD export to stl](https://user-images.githubusercontent.com/380158/34184975-d911c43c-e4f0-11e7-88ca-b52e6557ae83.gif)
 
