@@ -89,12 +89,14 @@ conda install -c conda-forge -c dlr-sc -c pythonocc -c oce pythonocc-core==0.18 
 #: Install enaml from repo (until some pending PR's are merged)
 pip install git+https://github.com/frmdstryr/enaml.git@latest
 
-
 #: Install enamlx
 pip install git+https://github.com/frmdstryr/enamlx.git
 
 #: Now install clone this repo
 git clone https://github.com/codelv/declaracad.git
+
+#: Install the dependencies
+pip install .
 
 #: Run 
 python main.py
