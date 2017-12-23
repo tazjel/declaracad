@@ -15,12 +15,9 @@ import enaml
 import traceback
 import jsonpickle as pickle
 from future.builtins import str
-from atom.api import (
-    Atom, Unicode, List, Member, Dict, Instance, ContainerList, Float, observe
-)
+from atom.api import Atom, Unicode, List, Member, Dict
 from enaml.workbench.plugin import Plugin as EnamlPlugin
 from enaml.widgets.api import Container
-from enaml.qt import QtCore, QtGui
 from .utils import log, clip
 
 
@@ -64,71 +61,6 @@ class Model(Atom):
                 ))
 
 
-class AreaBase(Model):
-    # Qt model representing this area
-    model = Instance(QtCore.QRectF)
-
-    #: Size (in px)
-    size = ContainerList(Float(), default=[1800, 2700]).tag(config=True)
-
-    # Left, Top, Right, Bottom (in px)
-    padding = ContainerList(Float(),
-                            default=[10, 10, 10, 10]).tag(config=True)
-
-    area = Instance(QtCore.QRectF)
-    path = Instance(QtGui.QPainterPath)
-    padding_path = Instance(QtGui.QPainterPath)
-
-    def _default_area(self):
-        return QtCore.QRectF(0, 0, self.size[0], self.size[1])
-
-    def _default_path(self):
-        p = QtGui.QPainterPath()
-        p.addRect(self.area)
-        return p
-
-    def _default_padding_path(self):
-        p = QtGui.QPainterPath()
-        p.addRect(self.available_area)
-        return p
-
-    @observe('size', 'padding')
-    def _sync_size(self, change):
-        self.area.setWidth(self.size[0])
-        self.area.setHeight(self.size[1])
-        self.path = self._default_path()
-        self.padding_path = self._default_padding_path()
-
-    @property
-    def padding_left(self):
-        return self.padding[0]
-
-    @property
-    def padding_top(self):
-        return self.padding[1]
-
-    @property
-    def padding_right(self):
-        return self.padding[2]
-
-    @property
-    def padding_bottom(self):
-        return self.padding[3]
-
-    def width(self):
-        return self.size[0]
-
-    def height(self):
-        return self.size[1]
-
-    @property
-    def available_area(self):
-        x, y = self.padding_left, self.padding_bottom
-        w, h = (self.size[0]-(self.padding_right+self.padding_left),
-                self.size[1]-(self.padding_bottom+self.padding_top))
-        return QtCore.QRectF(x, y, w, h)
-
-
 class Plugin(EnamlPlugin):
     """ A plugin that behaves like a model and saves it's state
     when any atom member tagged with config=True triggers a save.
@@ -158,21 +90,12 @@ class Plugin(EnamlPlugin):
         """ Unload any state observers when the plugin stops"""
         self._unbind_observers()
 
-    def run_command(self, protocol,  *args, **kwargs):
-        """ Run a command without blocking using twisted's spawnProcess 
-        
-        See https://twistedmatrix.com/documents/current/core/howto/process.html
-        
-        """
-        log.info(" ".join(args))
-        return reactor.spawnProcess(protocol, args[0], args, **kwargs)
-
     # -------------------------------------------------------------------------
     # State API
     # -------------------------------------------------------------------------
     def _default__state_file(self):
         return os.path.expanduser(
-            "~/.config/inkcut/{}.json".format(self.manifest.id))
+            "~/.config/declaracad/{}.json".format(self.manifest.id))
 
     def _default__state_members(self):
         members = []  #: Init state members

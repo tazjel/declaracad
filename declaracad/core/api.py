@@ -9,7 +9,7 @@ Created on Dec 6, 2015
 
 @author: jrm
 """
-from .models import Model, Plugin, AreaBase
+from .models import Model, Plugin
 from .widgets import PickableDockArea as DockArea
 from .widgets import PickableDockItem as DockItem
 from .utils import log

@@ -9,15 +9,19 @@ Created on Jul 12, 2015
 
 @author: jrm
 """
+import os
 import sys
 import logging
+from logging.handlers import RotatingFileHandler
 from atom.api import Unicode
 from .api import Plugin
 
 
 class CorePlugin(Plugin):
 
-    _log_format = Unicode('%(asctime)-15s | %(levelname)s | %(message)s')
+    _log_filename = Unicode()
+    _log_format = Unicode(
+        '%(asctime)-15s | %(levelname)-7s | %(name)s | %(message)s')
 
     def start(self):
         self.init_logging()
@@ -27,13 +31,32 @@ class CorePlugin(Plugin):
         ui = self.workbench.get_plugin('enaml.workbench.ui')
         ui.select_workspace('declaracad.workspace')
 
-    def init_logging(self):
-        log = logging.getLogger('declaracad')
-        handler = logging.StreamHandler()
-        handler.setLevel(logging.DEBUG)
-        handler.setFormatter(logging.Formatter(self._log_format))
-        log.addHandler(handler)
-        log.setLevel(logging.DEBUG)
 
-        #from twisted.python import log
-        #log.startLogging(sys.stdout)
+    def _default__log_filename(self):
+        log_dir = os.path.expanduser('~/.config/declaracad/logs')
+        if not os.path.exists(log_dir):
+            os.makedirs(log_dir)
+        return os.path.join(log_dir, 'declaracad.txt')
+
+    def init_logging(self):
+        """ Log to stdout and the file """
+        root = logging.getLogger()
+        root.setLevel(logging.DEBUG)
+        formatter = logging.Formatter(self._log_format)
+
+        #: Log to stdout
+        stream = logging.StreamHandler(sys.stdout)
+        stream.setLevel(logging.DEBUG)
+        stream.setFormatter(formatter)
+
+        #: Log to rotating handler
+        disk = RotatingFileHandler(
+            self._log_filename,
+            maxBytes=1024*1024*10,  # 10 MB
+            backupCount=10,
+        )
+        disk.setLevel(logging.DEBUG)
+        disk.setFormatter(formatter)
+
+        root.addHandler(disk)
+        root.addHandler(stream)
