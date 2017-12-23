@@ -162,6 +162,7 @@ enamldef EditorDockItem(DockItem): view:
 enamldef ErrorsDockItem(DockItem):
   title = "Errors"
   name = 'errors-item'
+  icon = load_icon('bug')
   Container:
     MultilineField:
         text << "\n".join(plugin.active_document.errors)

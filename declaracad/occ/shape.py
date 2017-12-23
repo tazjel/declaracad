@@ -188,6 +188,30 @@ class ProxyRevol(ProxyShape):
 
 
 class Shape(ToolkitObject):
+    """ Most basic shape component that can be displayed on the screen 
+    and represented by the framework. 
+    
+    This shape's proxy holds an internal reference to the underlying shape 
+    which can be accessed using `self.proxy.shape` if needed. The topology
+    of the shape can be accessed using the `topology` attribute.
+    
+    Notes
+    ------
+    
+    - A shape's position can be changed using the `position`, or `x`, `y`, and
+    `z`..
+    
+    - The orientation of the cone can be changed using 
+    the `direction` and `axis`.
+    
+    - The edges and faces of the shape (when applicable) can be accessed using
+    the `shape_edges` and `shape_faces` attributes respectively.
+    
+    - The `color`, `transparency` and `material` can be set to change the 
+    how the shape is rendered.
+    
+    
+    """
     #: Reference to the implementation control
     proxy = Typed(ProxyShape)
     
@@ -245,6 +269,15 @@ class Shape(ToolkitObject):
     
     #: Faces of this shape
     shape_faces = Property(lambda self: self._get_faces(), cached=True)
+
+    def _get_shells(self):
+        topo = self.proxy.topology
+        if not topo:
+            return []
+        return [e for e in topo.shells()]
+
+    #: Shells of this shape
+    shape_shells = Property(lambda self: self._get_shells(), cached=True)
     
     #: Block change updates to prevent loops when updated synced properties
     _block_updates = Bool()
@@ -296,16 +329,49 @@ class Shape(ToolkitObject):
     
     @observe('proxy.shape')
     def _update_topo(self, change):
-        self.get_member('shape_edges').reset(self)
-        self.get_member('shape_faces').reset(self)
-        
+        """ Update the cached topology references when the shape changes. s"""
+        for k in ['shape_edges', 'shape_faces', 'shape_shells']:
+            self.get_member(k).reset(self)
+
 
 class Face(Shape):
+    """ A Face turns it's first child Wire into a surface. 
+    
+    Examples
+    --------
+    
+    Add a Wire as a child 
+        Face:
+            Wire:
+                # etc.. 
+    
+    """
+
     #: Reference to the implementation control
     proxy = Typed(ProxyFace)
 
 
 class Box(Shape):
+    """ A primitive Box shape.  
+    
+    Attributes
+    ----------
+        dx: Float
+            Size or width of the box along the x-axis
+        dy: Float
+            Size or height of the box along the y-axis
+        dz: Float
+            Size or depth of the box along the z-axis  
+    
+    Examples
+    --------
+    
+        Box:
+            dx = 3  
+            dy = 10
+            # dx, dy, and dz are all 1 by default if omitted
+    
+    """
     #: Proxy shape
     proxy = Typed(ProxyBox)
     
@@ -326,8 +392,28 @@ class Box(Shape):
 
 
 class Cone(Shape):
-    """ Make a cone of height H radius R1 in the plane z = 0, 
-        R2 in the plane Z = H. R1 and R2 may be null."""
+    """ A primitive Cone shape.
+    
+    Attributes
+    ----------
+        height: Float
+            Height of the cone
+        radius: Float
+            Radius of the base of the cone
+        radius2: Float
+            Second radius of the base of the cone (to make it oval)  
+        angle: 
+            The angle to revolve (in radians) the base profile
+            
+    Examples
+    --------
+
+        Cone:
+            height = 10
+            radius = 5
+            angle = math.pi/2
+        
+    """
     #: Proxy shape
     proxy = Typed(ProxyCone)
     
@@ -343,14 +429,30 @@ class Cone(Shape):
     #: Angle
     angle = d_(Float(0, strict=False)).tag(view=True)
     
-    @observe('radius', 'r2', 'height', 'angle')
+    @observe('radius', 'radius2', 'height', 'angle')
     def _update_proxy(self, change):
         super(Cone, self)._update_proxy(change)
 
 
 class Cylinder(Shape):
-    """ Make a cylinder of radius R and length H with angle H.
+    """ A primitive Cylinder shape.
+
+    Attributes
+    ----------
+        height: Float
+            Height of the cylinder
+        radius: Float
+            Radius of the base of the cylinder
+        angle: 
+            The angle to revolve (in radians) the base profile.
+            
+    Examples
+    --------
     
+        Cone:
+            height = 10
+            radius = 5
+        
     """
     #: Proxy shape
     proxy = Typed(ProxyCylinder)
@@ -370,6 +472,34 @@ class Cylinder(Shape):
 
 
 class HalfSpace(Shape):
+    """ An infinite solid limited by a surface.
+
+    Attributes
+    ----------
+        surface: Face or Shell
+            Surface to divide
+            
+    Notes
+    -----
+     A half-space is an infinite solid, limited by a surface. It is built from 
+     a face or a shell, which bounds it, and with a reference point, which 
+     specifies the side of the surface where the matter of the half-space is 
+     located. A half-space is a tool commonly used in topological operations 
+     to cut another shape
+            
+    Examples
+    --------
+    
+    #: TODO: This does not work
+    
+        Box: box:
+            pass
+        
+        HalfSpace:
+            shape = box.shape_faces[0]
+            position = (1, 1, 1)
+        
+    """
     #: Proxy shape
     proxy = Typed(ProxyHalfSpace)
     
@@ -382,6 +512,41 @@ class HalfSpace(Shape):
 
         
 class Prism(Shape):
+    """ A Prism extrudes a Face into a solid or a Wire into a surface along 
+    the given vector. 
+    
+    Notes
+    -----
+    The first child node will be used as the shape if none is given.
+
+    Attributes
+    ----------
+        shape: Shape to extrude or None
+            Reference to the shape to extrude.
+        vector: Tuple of (x, y, z)
+            The extrusion vector.
+        infinite: Bool
+            Whether to extrude an infinte distance along the given vector.
+        copy: Bool
+            Copy the surface before extruding
+        canonize: Bool
+            Attempt to canonize in simple shapes
+   
+            
+    Examples
+    --------
+    
+    Prism:
+        Wire:
+            Polygon:
+                Looper:
+                    iterable = [(0,5,0), (2,6,0),  (5,4,0), (0,5,0)]
+                    Point:
+                        position = loop_item
+    
+    
+    """
+
     #: Proxy shape
     proxy = Typed(ProxyPrism)
     
@@ -389,7 +554,7 @@ class Prism(Shape):
     shape = d_(Instance(Shape)).tag(view=True)
     
     #: Vector to build prism from, ignored if infinite is true
-    vector = d_(Tuple((float, int))).tag(view=True)
+    vector = d_(Tuple((float, int), default=(0, 0, 1))).tag(view=True)
     
     #: Infinite
     infinite = d_(Bool(False)).tag(view=True)
@@ -406,6 +571,45 @@ class Prism(Shape):
 
 
 class Sphere(Shape):
+    """ A primitive Sphere shape. 
+    
+    Attributes
+    ----------
+        radius: Float
+            Radius of the sphere
+        angle: Float
+            The angle to revolve (in radians) along the base profile.
+        angle2: Float
+            See notes
+        angle3: Float
+            See notes
+    
+    
+    Notes
+    --------
+    Make a sphere of radius R. For all algorithms The resulting shape is 
+    composed of:
+    
+    - a lateral spherical face
+    - Two planar faces parallel to the plane z = 0 if the sphere is truncated 
+      in the v parametric direction, or only one planar face if angle1 is 
+      equal to -p/2 or if angle2 is equal to p/2 (these faces are circles in 
+      case of a complete truncated sphere),
+    - and in case of a portion of sphere, two planar faces to shut the shape.
+      (in the planes u = 0 and u = angle).
+
+            
+    Examples
+    --------
+    
+    Sphere:
+        radius = 3
+    
+    Sphere:
+        angle = math.pi/2
+        
+    
+    """
     #: Proxy shape
     proxy = Typed(ProxySphere)
     
