@@ -93,6 +93,10 @@ class Plugin(EnamlPlugin):
     # -------------------------------------------------------------------------
     # State API
     # -------------------------------------------------------------------------
+    def save(self):
+        """ Manually trigger a save """
+        self._save_state({'type': 'request'})
+
     def _default__state_file(self):
         return os.path.expanduser(
             "~/.config/declaracad/{}.json".format(self.manifest.id))
@@ -119,7 +123,7 @@ class Plugin(EnamlPlugin):
             pass  #: No state
         except Exception as e:
             log.warning("Plugin {} failed to load state: {}".format(
-                self.manifest.id, traceback.format_exc(e)))
+                self.manifest.id, traceback.format_exc()))
 
         #: Hook up observers
         for member in self._state_members:
@@ -127,7 +131,7 @@ class Plugin(EnamlPlugin):
 
     def _save_state(self, change):
         """ Try to save the plugin state """
-        if change['type'] in ['update', 'container']:
+        if change['type'] in ['update', 'container', 'request']:
             try:
                 log.info("Saving state due to change: {}".format(change))
 
@@ -172,4 +176,5 @@ class Plugin(EnamlPlugin):
 
     def _default_settings_items(self):
         return []
+
 

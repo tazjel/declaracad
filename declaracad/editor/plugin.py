@@ -39,23 +39,23 @@ def EditorDockItem(*args, **kwargs):
 
 class Document(Model):
     #: Name of the current document
-    name = Unicode()
+    name = Unicode().tag(config=True)
 
     #: Source code
-    source = Unicode().tag(persist=False)
-    cursor = Tuple(default=(0, 0)).tag(persist=False)
+    source = Unicode()
+    cursor = Tuple(default=(0, 0))
 
     #: Any unsaved changes
-    unsaved = Bool(True)
+    unsaved = Bool(True).tag(config=True)
 
     #: Any linting errors
-    errors = List()
+    errors = List().tag(config=True)
 
     #: Any autocomplete suggestions
-    suggestions = List()
+    suggestions = List().tag(config=True)
 
     #: Checker instance
-    checker = Instance(inspection.Checker).tag(persist=False)
+    checker = Instance(inspection.Checker)
 
     def _default_source(self):
         """ Load the document from the path given by `name`.
