@@ -74,7 +74,7 @@ enamldef NewFileDialog(Dialog): dialog:
                 text = "Save"
                 enabled << len(file_name.text) > 1
                 clicked ::
-                    event.parameters['path'] = file_name.text
+                    event.parameters['path'] = os.path.join(plugin.last_path, file_name.text)
                     plugin.new_file(event)
                     dialog.close()
 
