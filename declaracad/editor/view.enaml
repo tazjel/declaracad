@@ -44,7 +44,7 @@ def format_title(docs, doc, path, unsaved):
             #: See if there's still duplicates
             duplicates = [d for d in duplicates if d.endswith(tmp_name)]
             if not duplicates:
-                name = tmp_name
+                name = os.path.join(tmp_name, name)
                 break
 
         #: Give up
