@@ -17,13 +17,20 @@ from declaracad.core.api import Plugin, Model
 
 class Tool(Model):
     name = Unicode()
-    item = Subclass(Atom)
+    declaration = Subclass(Atom)
+    proxy = Subclass(Atom)
     doc = Unicode()
 
     def _observe_name(self, change):
+        from enaml.qt.qt_application import QtApplication
+        app = QtApplication.instance()
+
         from declaracad.occ import api
-        self.item = getattr(api, self.name)
-        self.doc = inspect.getdoc(self.item)
+        self.declaration = getattr(api, self.name)
+        factory = app.resolver.factories.get(self.name)
+        if factory:
+            self.proxy = factory()
+        self.doc = inspect.getdoc(self.declaration)
 
 
 class ToolboxPlugin(Plugin):

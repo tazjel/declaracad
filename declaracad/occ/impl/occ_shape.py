@@ -3,9 +3,7 @@ Created on Sep 30, 2016
 
 @author: jrm
 """
-from atom.api import (
-   Typed, observe
-)
+from atom.api import Typed, Unicode, observe, set_default
 
 from OCC.BRepBuilderAPI import BRepBuilderAPI_MakeShape, BRepBuilderAPI_MakeFace
 
@@ -496,6 +494,9 @@ class OccShape(ProxyShape):
     
     #: Topology explorer of the shape
     topology = Typed(Topology)
+
+    #: Class reference url
+    reference = Unicode()
     
     #--------------------------------------------------------------------------
     # Initialization API
@@ -627,7 +628,9 @@ class OccFace(OccDependentShape, ProxyFace):
 
 
 class OccBox(OccShape, ProxyBox):
-    
+    reference = set_default('https://dev.opencascade.org/doc/refman/html/'
+                            'class_b_rep_prim_a_p_i___make_box.html')
+
     def create_shape(self):
         d = self.declaration
         self.shape = BRepPrimAPI_MakeBox(d.axis, d.dx, d.dy, d.dz)#.Shape()
@@ -643,6 +646,8 @@ class OccBox(OccShape, ProxyBox):
 
 
 class OccCone(OccShape, ProxyCone):
+    reference = set_default('https://dev.opencascade.org/doc/refman/html/'
+                            'class_b_rep_prim_a_p_i___make_cone.html')
     
     def create_shape(self):
         d = self.declaration
@@ -665,6 +670,8 @@ class OccCone(OccShape, ProxyCone):
 
 
 class OccCylinder(OccShape, ProxyCylinder):
+    reference = set_default('https://dev.opencascade.org/doc/refman/html/'
+                            'class_b_rep_prim_a_p_i___make_cylinder.html')
     
     def create_shape(self):
         d = self.declaration
@@ -684,6 +691,8 @@ class OccCylinder(OccShape, ProxyCylinder):
 
 
 class OccHalfSpace(OccShape, ProxyHalfSpace):
+    reference = set_default('https://dev.opencascade.org/doc/refman/html/'
+                            'class_b_rep_prim_a_p_i___make_half_space.html')
     
     def create_shape(self):
         d = self.declaration
@@ -694,6 +703,8 @@ class OccHalfSpace(OccShape, ProxyHalfSpace):
 
 
 class OccPrism(OccDependentShape, ProxyPrism):
+    reference = set_default('https://dev.opencascade.org/doc/refman/html/'
+                            'class_b_rep_prim_a_p_i___make_prism.html')
     
     def update_shape(self, change):
         d = self.declaration
@@ -742,6 +753,8 @@ class OccPrism(OccDependentShape, ProxyPrism):
 
 
 class OccSphere(OccShape, ProxySphere):
+    reference = set_default('https://dev.opencascade.org/doc/refman/html/'
+                            'class_b_rep_prim_a_p_i___make_sphere.html')
     
     def create_shape(self):
         d = self.declaration
@@ -769,6 +782,9 @@ class OccSphere(OccShape, ProxySphere):
 
 
 class OccTorus(OccShape, ProxyTorus):
+
+    reference = set_default('https://dev.opencascade.org/doc/refman/html/'
+                            'class_b_rep_prim_a_p_i___make_torus.html')
     
     def create_shape(self):
         d = self.declaration
@@ -794,6 +810,9 @@ class OccTorus(OccShape, ProxyTorus):
         
 
 class OccWedge(OccShape, ProxyWedge):
+
+    reference = set_default('https://dev.opencascade.org/doc/refman/html/'
+                            'class_b_rep_prim_a_p_i___make_wedge.html')
     
     def create_shape(self):
         d = self.declaration
@@ -813,7 +832,11 @@ class OccWedge(OccShape, ProxyWedge):
 
 
 class OccRevol(OccDependentShape, ProxyRevol):
-    
+
+    #: Update the class reference
+    reference = set_default('https://dev.opencascade.org/doc/refman/html/'
+                            'class_b_rep_prim_a_p_i___make_wedge.html')
+
     def update_shape(self, change):
         d = self.declaration
         

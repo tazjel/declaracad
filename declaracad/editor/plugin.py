@@ -201,8 +201,11 @@ class EditorPlugin(Plugin):
         timed_call(350, do_save)
 
     def get_dock_area(self):
-        ui = self.workbench.get_plugin('enaml.workbench.ui')
-        return ui.workspace.content.find('dock_area')
+        """ Alias to the `declaracad.ui` plugins `get_dock_area()` 
+        
+        """
+        ui = self.workbench.get_plugin('declaracad.ui')
+        return ui.get_dock_area()
 
     def get_editor(self):
         """ Get the editor item for the currently active document 

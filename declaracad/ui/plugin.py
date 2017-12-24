@@ -58,6 +58,16 @@ class DeclaracadPlugin(Plugin):
         )
         return area
 
+    def get_dock_area(self):
+        """ Get the dock area
+        
+        Returns
+        -------
+            area: DockArea
+        """
+        ui = self.workbench.get_plugin('enaml.workbench.ui')
+        return ui.workspace.content.find('dock_area')
+
     def _refresh_dock_items(self, change=None):
         """ Reload all DockItems registered by any Plugins 
         

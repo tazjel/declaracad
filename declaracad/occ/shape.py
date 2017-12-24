@@ -188,28 +188,51 @@ class ProxyRevol(ProxyShape):
 
 
 class Shape(ToolkitObject):
-    """ Most basic shape component that can be displayed on the screen 
+    """ Abstract shape component that can be displayed on the screen 
     and represented by the framework. 
     
-    This shape's proxy holds an internal reference to the underlying shape 
-    which can be accessed using `self.proxy.shape` if needed. The topology
-    of the shape can be accessed using the `topology` attribute.
+    Attributes  
+    ----------
+        position: Tuple
+            A tuple or list of the (x, y, z) position of this shape. This is
+            coerced into a Point.
+        x: Float
+        y: Float
+        z: Float
+            Alias to the position
+        direction: Tuple
+            A tuple or list of the (u, v, w) vector of this shape. This is
+            coerced into a Vector.
+        axis: Tuple
+            A tuple or list of the (u, v, w) axis of this shape. This is
+            coerced into a Vector that defines the x, y, and z orientation of
+            this shape.
+        tolerance: Float
+            The tolerance to use for operations that may require it.
+            
+        color: string
+            A string representing the color of the shape.
+        material: String
+            A string represeting a pre-defined material which defines a color
+            and luminosity of the shape.
+        transparency: Float
+            The opacity of the shape used for display.
+            
+        shape_edges: List
+            A read only property that returns the list of edges this shape
+            has (if any).
+        shape_faces: List
+            A read only property that returns the list of faces this shape
+            has (if any).
+        shape_shells: List
+            A read only property that returns the list of surfaces this shape
+            has (if any).
     
     Notes
     ------
-    
-    - A shape's position can be changed using the `position`, or `x`, `y`, and
-    `z`..
-    
-    - The orientation of the cone can be changed using 
-    the `direction` and `axis`.
-    
-    - The edges and faces of the shape (when applicable) can be accessed using
-    the `shape_edges` and `shape_faces` attributes respectively.
-    
-    - The `color`, `transparency` and `material` can be set to change the 
-    how the shape is rendered.
-    
+    This shape's proxy holds an internal reference to the underlying shape 
+    which can be accessed using `self.proxy.shape` if needed. The topology
+    of the shape can be accessed using the `self.proxy.topology` attribute.
     
     """
     #: Reference to the implementation control
@@ -412,7 +435,7 @@ class Cone(Shape):
             height = 10
             radius = 5
             angle = math.pi/2
-        
+    
     """
     #: Proxy shape
     proxy = Typed(ProxyCone)
@@ -452,7 +475,7 @@ class Cylinder(Shape):
         Cone:
             height = 10
             radius = 5
-        
+    
     """
     #: Proxy shape
     proxy = Typed(ProxyCylinder)
@@ -498,7 +521,13 @@ class HalfSpace(Shape):
         HalfSpace:
             shape = box.shape_faces[0]
             position = (1, 1, 1)
-        
+    
+    References
+    ----------
+    
+    https://dev.opencascade.org/doc/refman/html/
+        class_b_rep_prim_a_p_i___make_half_space.html
+    
     """
     #: Proxy shape
     proxy = Typed(ProxyHalfSpace)
@@ -543,7 +572,6 @@ class Prism(Shape):
                     iterable = [(0,5,0), (2,6,0),  (5,4,0), (0,5,0)]
                     Point:
                         position = loop_item
-    
     
     """
 
@@ -607,7 +635,6 @@ class Sphere(Shape):
     
     Sphere:
         angle = math.pi/2
-        
     
     """
     #: Proxy shape
@@ -631,9 +658,29 @@ class Sphere(Shape):
 
 
 class Torus(Shape):
-    #: Proxy shape
-    proxy = Typed(ProxyTorus) 
+    """ A primitive Torus shape (a ring like shape).
+
+    Attributes
+    ----------
+        radius: Float
+            Radius of the torus
+        radius2: Float
+            Radius of the torus profile
+        angle:  Float
+            The angle to revolve the torus (in radians).
+        angle2: Float
+            The angle to revolve the torus profile (in radians).
+            
+    Examples
+    --------
     
+        Torus:
+            radius = 5
+    
+    """
+    #: Proxy shape
+    proxy = Typed(ProxyTorus)
+
     #: Radius of sphere
     radius = d_(Float(1, strict=False)).tag(view=True)
     
@@ -652,9 +699,30 @@ class Torus(Shape):
 
 
 class Wedge(Shape):
+    """ A primitive Wedge shape.
+    
+    Attributes
+    ----------
+        dx: Float
+            Size of the wedge along the x-axis
+        dy: Float
+            Size of the wedge along the y-axis
+        dz:  Float
+            Size of the wedge along the z-axis
+        ltx: Float
+            Size of the base before the wedge starts. Must be >= 0. 
+            Defaults to 0.
+            
+    Examples
+    --------
+    
+        Wedge:
+            dy = 5
+            
+    """
     #: Proxy shape
     proxy = Typed(ProxyWedge)
-    
+
     #: x size
     dx = d_(Float(1, strict=False)).tag(view=True)
     
@@ -675,6 +743,27 @@ class Wedge(Shape):
 
 
 class Revol(Shape):
+    """ A primitive Wedge shape.
+    
+    Attributes
+    ----------
+        dx: Float
+            Size of the wedge along the x-axis
+        dy: Float
+            Size of the wedge along the y-axis
+        dz:  Float
+            Size of the wedge along the z-axis
+        ltx: Float
+            Size of the base before the wedge starts. Must be >= 0. 
+            Defaults to 0.
+            
+    Examples
+    --------
+    
+        Wedge:
+            dy = 5
+            
+    """
     #: Proxy shape
     proxy = Typed(ProxyRevol)
     
