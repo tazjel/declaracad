@@ -10,6 +10,7 @@ Created on Dec 10, 2015
 @author: jrm
 """
 import inspect
+import textwrap
 from atom.api import Enum
 from enaml.core.api import Looper, Conditional
 from enaml.widgets.api import  Container, Menu, Action
@@ -18,11 +19,14 @@ from declaracad.core.api import DockItem
 from declaracad.core.utils import load_icon
 
 
+
+
 enamldef ToolboxDockItem(DockItem):
     title = 'Toolbox'
     name = 'toolbox-item'
     icon = load_icon('box')
     closable = False
+
     Container:
         padding = 0
         TreeView: tree:
@@ -38,7 +42,7 @@ enamldef ToolboxDockItem(DockItem):
                                     if not n.startswith("_")], key=lambda m:m.name)
                     Menu:
                         Action:
-                            text = "Class docs"
+                            text = "Show reference docs"
                             attr url = (loop_item.proxy.reference.default_value_mode[-1]
                                             if hasattr(loop_item.proxy, 'reference') else '')
                             visible << bool(url)
@@ -48,14 +52,22 @@ enamldef ToolboxDockItem(DockItem):
                         Action:
                             separator = True
                         Action:
-                            text = "Implementation source"
+                            text = "Show proxy class"
                             attr src = inspect.getsource(loop_item.proxy)
                             visible << bool(src)
                             triggered ::
                                 docs = plugin.workbench.get_plugin("declaracad.docs")
                                 docs.set_source(src)
                         Action:
-                            text = "Declaration source"
+                            text = "Show proxy source"
+                            attr path = inspect.getfile(loop_item.proxy)
+                            visible << bool(path)
+                            triggered ::
+                                docs = plugin.workbench.get_plugin("declaracad.docs")
+                                with open(path) as f:
+                                    docs.set_source(f.read())
+                        Action:
+                            text = "Show declaration class"
                             attr src = inspect.getsource(loop_item.declaration)
                             visible << bool(src)
                             triggered ::

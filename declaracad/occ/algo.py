@@ -221,6 +221,7 @@ class Operation(Shape):
 
 
 class BooleanOperation(Operation):
+
     shape1 = d_(Instance(object))
     
     shape2 = d_(Instance(object))

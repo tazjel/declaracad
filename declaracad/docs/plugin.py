@@ -27,6 +27,19 @@ class DocsPlugin(Plugin):
     # -------------------------------------------------------------------------
     def set_url(self, url):
         self.url, self.source = url, ""
+        ui = self.workbench.get_plugin("declaracad.ui")
+        item = ui.get_dock_area().find('docs-item')
+        item.alert('info')
 
     def set_source(self, source):
         self.url, self.source = "", source
+
+        #: Update the editor
+        ui = self.workbench.get_plugin("declaracad.ui")
+        item = ui.get_dock_area().find('docs-item')
+        container = item.children[0]
+        for c in container.children:
+            if hasattr(c, 'set_text'):
+                c.set_text(self.source)
+                break
+        item.alert('info')

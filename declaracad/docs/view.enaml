@@ -13,9 +13,12 @@ import inspect
 from atom.api import Enum
 from enaml.core.api import Looper, Conditional
 from enaml.widgets.api import  Container, Menu, Action, WebView
+from enaml.scintilla.api import Scintilla
+from enaml.scintilla.themes import THEMES
 from enamlx.widgets.api import TreeView, TreeViewItem, TreeViewColumn
 from declaracad.core.api import DockItem
 from declaracad.core.utils import load_icon
+
 
 
 enamldef DocsDockItem(DockItem):
@@ -25,5 +28,30 @@ enamldef DocsDockItem(DockItem):
     closable = False
     Container:
         padding = 0
-        WebView:
-            url << plugin.url
+        Conditional:
+            condition << bool(plugin.url)
+            WebView:
+                url << plugin.url
+        Conditional:
+            condition << not plugin.url
+            Scintilla:
+                hug_height = 'ignore'
+                hug_width = 'ignore'
+                minimum_size = (320, 320)
+                syntax = 'enaml'
+                theme  << (THEMES[plugin.workbench.get_plugin("declaracad.editor").theme]
+                            if plugin else THEMES['tango'])
+                settings = {
+                    "tab_width": 4,
+                    "use_tabs": False,
+                    "indent": 4,
+                    "tab_indents": True,
+                    "auto_indent": True,
+                    "backspace_unindents": True,
+                    "autocompletion_threshold": 1,
+                    "autocompletion_case_sensitive": True,
+                    "show_line_numbers": True,
+                }
+                activated ::
+                    self.set_text(plugin.source)
+                    self.proxy.widget.setReadOnly(True)

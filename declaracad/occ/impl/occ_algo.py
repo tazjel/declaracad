@@ -3,9 +3,7 @@ Created on Sep 27, 2016
 
 @author: jrm
 """
-from atom.api import (
-   Int, Dict, Instance
-)
+from atom.api import Int, Dict, Instance, set_default
 from enaml.application import timed_call
 from ..algo import (
     ProxyOperation, ProxyBooleanOperation, ProxyCommon, ProxyCut, ProxyFuse,
@@ -85,6 +83,10 @@ class OccOperation(OccDependentShape, ProxyOperation):
 
 
 class OccBooleanOperation(OccOperation, ProxyBooleanOperation):
+    """ Base class for a boolean shape operation. 
+    
+    """
+
     
     def create_shape(self):
         """ Create the toolkit shape for the proxy object.
@@ -112,6 +114,8 @@ class OccBooleanOperation(OccOperation, ProxyBooleanOperation):
 
 class OccCommon(OccBooleanOperation, ProxyCommon):
     """ Common of all the child shapes together. """
+    reference = set_default('https://dev.opencascade.org/doc/refman/html/'
+                            'class_b_rep_algo_a_p_i___common.html')
     
     def _do_operation(self, shape1, shape2):
         d = self.declaration
@@ -123,7 +127,9 @@ class OccCommon(OccBooleanOperation, ProxyCommon):
 
 class OccCut(OccBooleanOperation, ProxyCut):
     """ Cut all the child shapes from the first shape. """
-    
+    reference = set_default('https://dev.opencascade.org/doc/refman/html/'
+                            'class_b_rep_algo_a_p_i___cut.html')
+
     def _do_operation(self, shape1, shape2):
         d = self.declaration
         args = [shape1, shape2]
@@ -134,7 +140,8 @@ class OccCut(OccBooleanOperation, ProxyCut):
 
 class OccFuse(OccBooleanOperation, ProxyFuse):
     """ Fuse all the child shapes together. """
-    
+    reference = set_default('https://dev.opencascade.org/doc/refman/html/'
+                            'class_b_rep_algo_a_p_i___fuse.html')
     def _do_operation(self, shape1, shape2):
         d = self.declaration
         args = [shape1, shape2]
@@ -144,7 +151,9 @@ class OccFuse(OccBooleanOperation, ProxyFuse):
 
 
 class OccFillet(OccOperation, ProxyFillet):
-    
+    reference = set_default('https://dev.opencascade.org/doc/refman/html/'
+                            'class_b_rep_fillet_a_p_i___make_fillet.html')
+
     shape_types = Dict(default={
         'rational': ChFi3d_Rational,
         'angular': ChFi3d_QuasiAngular,
@@ -181,7 +190,9 @@ class OccFillet(OccOperation, ProxyFillet):
         
         
 class OccChamfer(OccOperation, ProxyChamfer):
-    
+    reference = set_default('https://dev.opencascade.org/doc/refman/html/'
+                            'class_b_rep_fillet_a_p_i___make_chamfer.html')
+
     def get_shape(self):
         """ Return shape to apply the chamfer to. """
         for child in self.children():
@@ -225,6 +236,8 @@ class OccChamfer(OccOperation, ProxyChamfer):
 
 
 class OccOffset(OccOperation, ProxyOffset):
+    reference = set_default('https://dev.opencascade.org/doc/refman/html/'
+                            'class_b_rep_offset_a_p_i___make_offset.html')
     
     offset_modes = Dict(default={
         'skin': BRepOffset_Skin,
@@ -281,6 +294,8 @@ class OccOffset(OccOperation, ProxyOffset):
 
 
 class OccThickSolid(OccOffset, ProxyThickSolid):
+    reference = set_default('https://dev.opencascade.org/doc/refman/html/'
+                            'class_b_rep_offset_a_p_i___make_thick_solid.html')
     
     def get_faces(self, shape):
         d = self.declaration
