@@ -20,7 +20,26 @@ class ProxyPart(ProxyShape):
 
     
 class Part(Shape):
-    """ A part is simply a group of shapes """
+    """ A Part is a compound shape. It may contain
+    any number of nested parts and is typically subclassed.
+    
+    Attributes
+    ----------
+    name: String
+        An optional name for the part
+    description: String
+        An optional description for the part
+    
+    Examples
+    --------
+    
+    enamldef Case(Part):
+        TopCover:
+            # etc..
+        BottomCover:
+            # etc..
+    
+    """
     #: Reference to the implementation control
     proxy = Typed(ProxyPart)
     
