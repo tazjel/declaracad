@@ -522,12 +522,6 @@ class HalfSpace(Shape):
             shape = box.shape_faces[0]
             position = (1, 1, 1)
     
-    References
-    ----------
-    
-    https://dev.opencascade.org/doc/refman/html/
-        class_b_rep_prim_a_p_i___make_half_space.html
-    
     """
     #: Proxy shape
     proxy = Typed(ProxyHalfSpace)
