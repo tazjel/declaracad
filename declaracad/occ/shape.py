@@ -737,25 +737,29 @@ class Wedge(Shape):
 
 
 class Revol(Shape):
-    """ A primitive Wedge shape.
+    """ A Revol creates a shape by revolving a profile about an axis.
     
     Attributes
     ----------
-        dx: Float
-            Size of the wedge along the x-axis
-        dy: Float
-            Size of the wedge along the y-axis
-        dz:  Float
-            Size of the wedge along the z-axis
-        ltx: Float
-            Size of the base before the wedge starts. Must be >= 0. 
-            Defaults to 0.
+        shape: Shape
+            Shape to revolve. If not given, the first child will be used.
+        angle: Float
+            Angle to revolve (in radians) the base profile.
+        copy:  Bool
+            Make a copy of the referenced shape.
             
     Examples
     --------
     
-        Wedge:
-            dy = 5
+    This creates a cone of radius 4 and height 5.
+    
+        Revol:
+            Wire:
+                Segment:
+                    Looper:
+                        iterable = [(0,0,0), (0,2,5),  (0,5,0), (0,0,0)]
+                        Point:
+                            position = loop_item
             
     """
     #: Proxy shape
