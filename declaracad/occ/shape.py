@@ -193,43 +193,43 @@ class Shape(ToolkitObject):
     
     Attributes  
     ----------
-        position: Tuple
-            A tuple or list of the (x, y, z) position of this shape. This is
-            coerced into a Point.
-        x: Float
-        y: Float
-        z: Float
-            Alias to the position
-        direction: Tuple
-            A tuple or list of the (u, v, w) vector of this shape. This is
-            coerced into a Vector.
-        axis: Tuple
-            A tuple or list of the (u, v, w) axis of this shape. This is
-            coerced into a Vector that defines the x, y, and z orientation of
-            this shape.
-        tolerance: Float
-            The tolerance to use for operations that may require it.
-            
-        color: string
-            A string representing the color of the shape.
-        material: String
-            A string represeting a pre-defined material which defines a color
-            and luminosity of the shape.
-        transparency: Float
-            The opacity of the shape used for display.
-            
-        shape_edges: List
-            A read only property that returns the list of edges this shape
-            has (if any).
-        shape_faces: List
-            A read only property that returns the list of faces this shape
-            has (if any).
-        shape_shells: List
-            A read only property that returns the list of surfaces this shape
-            has (if any).
     
+    position: Tuple
+        A tuple or list of the (x, y, z) position of this shape. This is
+        coerced into a Point.
+    x: Float
+    y: Float
+    z: Float
+        Alias to the position
+    direction: Tuple
+        A tuple or list of the (u, v, w) vector of this shape. This is
+        coerced into a Vector.
+    axis: Tuple
+        A tuple or list of the (u, v, w) axis of this shape. This is
+        coerced into a Vector that defines the x, y, and z orientation of
+        this shape.
+    tolerance: Float
+        The tolerance to use for operations that may require it.
+    color: string
+        A string representing the color of the shape.
+    material: String
+        A string represeting a pre-defined material which defines a color
+        and luminosity of the shape.
+    transparency: Float
+        The opacity of the shape used for display.
+    shape_edges: List
+        A read only property that returns the list of edges this shape
+        has (if any).
+    shape_faces: List
+        A read only property that returns the list of faces this shape
+        has (if any).
+    shape_shells: List
+        A read only property that returns the list of surfaces this shape
+        has (if any).
+
     Notes
     ------
+    
     This shape's proxy holds an internal reference to the underlying shape 
     which can be accessed using `self.proxy.shape` if needed. The topology
     of the shape can be accessed using the `self.proxy.topology` attribute.
@@ -379,20 +379,21 @@ class Box(Shape):
     
     Attributes
     ----------
-        dx: Float
-            Size or width of the box along the x-axis
-        dy: Float
-            Size or height of the box along the y-axis
-        dz: Float
-            Size or depth of the box along the z-axis  
     
+    dx: Float
+        Size or width of the box along the x-axis
+    dy: Float
+        Size or height of the box along the y-axis
+    dz: Float
+        Size or depth of the box along the z-axis  
+
     Examples
     --------
     
-        Box:
-            dx = 3  
-            dy = 10
-            # dx, dy, and dz are all 1 by default if omitted
+    Box:
+        dx = 3  
+        dy = 10
+        # dx, dy, and dz are all 1 by default if omitted
     
     """
     #: Proxy shape
@@ -419,22 +420,23 @@ class Cone(Shape):
     
     Attributes
     ----------
-        height: Float
-            Height of the cone
-        radius: Float
-            Radius of the base of the cone
-        radius2: Float
-            Second radius of the base of the cone (to make it oval)  
-        angle: 
-            The angle to revolve (in radians) the base profile
+    
+    height: Float
+        Height of the cone
+    radius: Float
+        Radius of the base of the cone
+    radius2: Float
+        Second radius of the base of the cone (to make it oval)  
+    angle: 
+        The angle to revolve (in radians) the base profile
             
     Examples
     --------
 
-        Cone:
-            height = 10
-            radius = 5
-            angle = math.pi/2
+    Cone:
+        height = 10
+        radius = 5
+        angle = math.pi/2
     
     """
     #: Proxy shape
@@ -462,19 +464,20 @@ class Cylinder(Shape):
 
     Attributes
     ----------
-        height: Float
-            Height of the cylinder
-        radius: Float
-            Radius of the base of the cylinder
-        angle: 
-            The angle to revolve (in radians) the base profile.
+    
+    height: Float
+        Height of the cylinder
+    radius: Float
+        Radius of the base of the cylinder
+    angle: 
+        The angle to revolve (in radians) the base profile.
             
     Examples
     --------
     
-        Cone:
-            height = 10
-            radius = 5
+    Cone:
+        height = 10
+        radius = 5
     
     """
     #: Proxy shape
@@ -499,11 +502,13 @@ class HalfSpace(Shape):
 
     Attributes
     ----------
-        surface: Face or Shell
-            Surface to divide
+    
+    surface: Face or Shell
+        Surface to divide
             
     Notes
     -----
+    
      A half-space is an infinite solid, limited by a surface. It is built from 
      a face or a shell, which bounds it, and with a reference point, which 
      specifies the side of the surface where the matter of the half-space is 
@@ -515,12 +520,12 @@ class HalfSpace(Shape):
     
     #: TODO: This does not work
     
-        Box: box:
-            pass
-        
-        HalfSpace:
-            shape = box.shape_faces[0]
-            position = (1, 1, 1)
+    Box: box:
+        pass
+    
+    HalfSpace:
+        shape = box.shape_faces[0]
+        position = (1, 1, 1)
     
     """
     #: Proxy shape
@@ -538,23 +543,25 @@ class Prism(Shape):
     """ A Prism extrudes a Face into a solid or a Wire into a surface along 
     the given vector. 
     
-    Notes
-    -----
-    The first child node will be used as the shape if none is given.
-
     Attributes
     ----------
-        shape: Shape to extrude or None
-            Reference to the shape to extrude.
-        vector: Tuple of (x, y, z)
-            The extrusion vector.
-        infinite: Bool
-            Whether to extrude an infinte distance along the given vector.
-        copy: Bool
-            Copy the surface before extruding
-        canonize: Bool
-            Attempt to canonize in simple shapes
-   
+    
+    shape: Shape to extrude or None
+        Reference to the shape to extrude.
+    vector: Tuple of (x, y, z)
+        The extrusion vector.
+    infinite: Bool
+        Whether to extrude an infinte distance along the given vector.
+    copy: Bool
+        Copy the surface before extruding
+    canonize: Bool
+        Attempt to canonize in simple shapes
+    
+    Notes
+    -----
+    
+    The first child node will be used as the shape if none is given.
+
             
     Examples
     --------
@@ -597,18 +604,20 @@ class Sphere(Shape):
     
     Attributes
     ----------
-        radius: Float
-            Radius of the sphere
-        angle: Float
-            The angle to revolve (in radians) along the base profile.
-        angle2: Float
-            See notes
-        angle3: Float
-            See notes
+    
+    radius: Float
+        Radius of the sphere
+    angle: Float
+        The angle to revolve (in radians) along the base profile.
+    angle2: Float
+        See notes
+    angle3: Float
+        See notes
     
     
     Notes
     --------
+    
     Make a sphere of radius R. For all algorithms The resulting shape is 
     composed of:
     
@@ -656,20 +665,21 @@ class Torus(Shape):
 
     Attributes
     ----------
-        radius: Float
-            Radius of the torus
-        radius2: Float
-            Radius of the torus profile
-        angle:  Float
-            The angle to revolve the torus (in radians).
-        angle2: Float
-            The angle to revolve the torus profile (in radians).
+    
+    radius: Float
+        Radius of the torus
+    radius2: Float
+        Radius of the torus profile
+    angle:  Float
+        The angle to revolve the torus (in radians).
+    angle2: Float
+        The angle to revolve the torus profile (in radians).
             
     Examples
     --------
     
-        Torus:
-            radius = 5
+    Torus:
+        radius = 5
     
     """
     #: Proxy shape
@@ -697,21 +707,22 @@ class Wedge(Shape):
     
     Attributes
     ----------
-        dx: Float
-            Size of the wedge along the x-axis
-        dy: Float
-            Size of the wedge along the y-axis
-        dz:  Float
-            Size of the wedge along the z-axis
-        ltx: Float
-            Size of the base before the wedge starts. Must be >= 0. 
-            Defaults to 0.
+        
+    dx: Float
+        Size of the wedge along the x-axis
+    dy: Float
+        Size of the wedge along the y-axis
+    dz:  Float
+        Size of the wedge along the z-axis
+    ltx: Float
+        Size of the base before the wedge starts. Must be >= 0. 
+        Defaults to 0.
             
     Examples
     --------
     
-        Wedge:
-            dy = 5
+    Wedge:
+        dy = 5
             
     """
     #: Proxy shape
@@ -741,25 +752,26 @@ class Revol(Shape):
     
     Attributes
     ----------
-        shape: Shape
-            Shape to revolve. If not given, the first child will be used.
-        angle: Float
-            Angle to revolve (in radians) the base profile.
-        copy:  Bool
-            Make a copy of the referenced shape.
+        
+    shape: Shape
+        Shape to revolve. If not given, the first child will be used.
+    angle: Float
+        Angle to revolve (in radians) the base profile.
+    copy:  Bool
+        Make a copy of the referenced shape.
             
     Examples
     --------
     
-    This creates a cone of radius 4 and height 5.
+    # This creates a cone of radius 4 and height 5.
     
-        Revol:
-            Wire:
-                Segment:
-                    Looper:
-                        iterable = [(0,0,0), (0,2,5),  (0,5,0), (0,0,0)]
-                        Point:
-                            position = loop_item
+    Revol:
+        Wire:
+            Segment:
+                Looper:
+                    iterable = [(0,0,0), (0,2,5),  (0,5,0), (0,0,0)]
+                    Point:
+                        position = loop_item
             
     """
     #: Proxy shape

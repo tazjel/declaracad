@@ -104,7 +104,15 @@ class ProxyWire(ProxyShape):
 
 
 class Point(Shape):
-    """ Creates a point with its 3 cartesian's coordinates : Xp, Yp, Zp. """
+    """ A Point at a specific position.
+    
+    Examples
+    --------
+    
+    Point:
+        positon = (10, 100, 0)
+    
+    """
     proxy = Typed(ProxyPoint)
 
 

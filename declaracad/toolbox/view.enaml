@@ -11,13 +11,39 @@ Created on Dec 10, 2015
 """
 import inspect
 import textwrap
+import markdown
 from atom.api import Enum
 from enaml.core.api import Looper, Conditional
 from enaml.widgets.api import  Container, Menu, Action
 from enamlx.widgets.api import TreeView, TreeViewItem, TreeViewColumn
 from declaracad.core.api import DockItem
 from declaracad.core.utils import load_icon
+from numpydoc.docscrape import NumpyDocString
 
+def format_docs(src):
+    doc = NumpyDocString(src)
+    d = doc.get('Summary',[])
+    notes = doc.get('Notes')
+    if notes:
+        d.extend(['##### Notes']+notes)
+    attrs = doc.get('Attributes')
+    if attrs:
+        d.append('##### Attributes')
+        for a in attrs:
+            if not a:
+                continue
+            adoc = [x for x in a[2] if x]
+            d.append(' - {} {}'.format(a[0],('- ' + "\n".join(adoc)) if adoc else ''))
+    examples = doc.get('Examples')
+    if examples:
+        d.extend(['##### Examples', '```python']+examples+['```'])
+
+
+    return markdown.markdown("\n".join(d), extensions=[
+        'markdown.extensions.fenced_code',
+        'markdown.extensions.codehilite',
+        'markdown.extensions.tables',
+    ])
 
 
 
@@ -37,7 +63,7 @@ enamldef ToolboxDockItem(DockItem):
                 iterable << tree.items
                 TreeViewItem:
                     text = loop_item.name
-                    tool_tip = loop_item.doc
+                    tool_tip = format_docs(loop_item.doc)
                     items = sorted([m for n, m in loop_item.declaration.members().items()
                                     if not n.startswith("_")], key=lambda m:m.name)
                     Menu:
@@ -76,7 +102,7 @@ enamldef ToolboxDockItem(DockItem):
                     TreeViewColumn:
                         attr base = loop_item.declaration.__bases__[0]
                         text = base.__name__
-                        tool_tip = inspect.getdoc(base)
+                        tool_tip = format_docs(inspect.getdoc(base))
                     Looper:
                         iterable << parent.items
                         TreeViewItem:

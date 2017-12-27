@@ -221,6 +221,17 @@ class Operation(Shape):
 
 
 class BooleanOperation(Operation):
+    """ A base class for a boolean operation on two or more shapes.
+    
+    Attributes
+    ----------
+    
+        shape1: Shape
+            The first shape argument of the operation.
+        shape2: Shape
+            The second shape argument of the operation.
+    
+    """
 
     shape1 = d_(Instance(object))
     
@@ -235,26 +246,98 @@ class BooleanOperation(Operation):
         
         
 class Common(BooleanOperation):
+    """ An operation that results in the intersection or common volume
+    of the two shapes. This operation is repeated to give the intersection 
+    all child shapes.
+
+    Examples
+    ----------
+    
+    Common:
+        Box:
+            pass
+        Circle:
+            radius = 2
+        Torus:
+            radius = 1
+    
+    
+    """
     #: Reference to the implementation control
     proxy = Typed(ProxyCommon)
 
 
 class Cut(BooleanOperation):
+    """ An operation that results in the subtraction of the second and 
+    following shapes the first shape.  This operation is repeated for all 
+    additional child shapes if more than two are given.
+
+    Examples
+    ----------
+    
+    Cut:
+        Box:
+            dx = 2
+            dy = 2
+            dz = 2
+        Box:
+            pass
+        
+        # etc...
+    
+    """
     #: Reference to the implementation control
     proxy = Typed(ProxyCut)
 
 
 class Fuse(BooleanOperation):
+    """ An operation that results in the addition all of the child shapes. 
+    
+       Examples
+       ----------
+       
+       Fuse:
+           Box:
+               pass
+           Box:
+               position = (1,0,0)
+           
+    """
     #: Reference to the implementation control
     proxy = Typed(ProxyFuse)
 
 
 class LocalOperation(Operation):
-    pass
+    """ A base class for operations on the edges of shapes. 
+    
+    """
 
 
 class Fillet(LocalOperation):
-    """ Applies fillet to the first child shape"""
+    """ Applies fillet operation to the first child shape. 
+    
+    Attributes
+    ----------
+    
+    shape: String
+        The fillet shape type apply
+    radius: Float
+        Radius of the fillet. Must be less than the face width.
+    edges: List of edges, optional
+        List of edges to apply the operation to. If not given all edges will
+        be used.  Used in conjunction with the `shape_edges` attribute. 
+    
+    Examples
+    --------
+    
+    Fillet:
+        #: Fillet the first 4 edges of the box (left side) 
+        edges = [e for i, e in enumerate(box.shape_edges) if i < 4]
+        radius = 0.1
+        Box: box:
+            pass
+        
+    """
     #: Reference to the implementation control
     proxy = Typed(ProxyFillet)
     
@@ -275,6 +358,33 @@ class Fillet(LocalOperation):
 
 
 class Chamfer(LocalOperation):
+    """ Applies Chamfer operation to the first child shape. 
+   
+    Attributes
+    ----------
+    
+    distance: Float
+       The distance of the chamfer to apply
+    distance2: Float
+       The second distance of the chamfer to apply
+    edges: List of edges, optional
+       List of edges to apply the operation to. If not given all edges will
+       be used.  Used in conjunction with the `shape_edges` attribute.
+    faces: List of faces, optional
+       List of faces to apply the operation to. If not given, all faces will
+       be used.  Used in conjunction with the `shape_edges` attribute. 
+    
+    Examples
+    --------
+    
+    Chamfer:
+        #: Fillet the top of the cylinder
+        faces = [cyl.shape_faces[0]]
+        distance = 0.2
+        Cylinder: cyl:
+           pass
+       
+    """
     #: Reference to the implementation control
     proxy = Typed(ProxyChamfer)
     
@@ -284,10 +394,11 @@ class Chamfer(LocalOperation):
     #: Second of chamfer (leave 0 if not used)
     distance2 = d_(Float(0, strict=False)).tag(view=True, group='Chamfer')
     
-    #: Edges to apply fillet to
+    #: Edges to apply chamfer to
     #: Leave blank to use all edges of the shape 
     edges = d_(ContainerList()).tag(view=True, group='Chamfer')
-    
+
+    #: Faces to apply the chamfer to
     faces = d_(ContainerList()).tag(view=True, group='Chamfer')
     
     @observe('distance', 'distance2', 'edges', 'faces')

@@ -52,6 +52,3 @@ class Part(Shape):
     @property
     def shapes(self):
         return [child for child in self.children if isinstance(child, Shape)]
-    
-    
-

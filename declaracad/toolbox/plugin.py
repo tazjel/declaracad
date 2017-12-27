@@ -11,6 +11,7 @@ Created on Dec 10, 2015
 @author: jrm
 """
 import inspect
+import logging
 from atom.api import Atom, Subclass, List, Unicode
 from declaracad.core.api import Plugin, Model
 
@@ -41,3 +42,7 @@ class ToolboxPlugin(Plugin):
     def _default_tools(self):
         from declaracad.occ import api
         return [Tool(name=it) for it in dir(api) if not it.startswith("_")]
+
+    def start(self):
+        log = logging.getLogger('MARKDOWN')
+        log.setLevel(logging.WARNING)
