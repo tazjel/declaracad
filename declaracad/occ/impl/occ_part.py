@@ -31,5 +31,8 @@ class OccPart(OccDependentShape, ProxyPart):
         shape = self.shape
         builder.MakeCompound(shape)
         for s in self.shapes:
-            builder.Add(shape, s.shape.Shape())
+            if hasattr(s.shape, 'Shape'):
+                builder.Add(shape, s.shape.Shape())
+            else:
+                builder.Add(shape, s.shape)
         self.builder = builder

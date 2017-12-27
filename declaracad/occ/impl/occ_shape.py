@@ -3,11 +3,14 @@ Created on Sep 30, 2016
 
 @author: jrm
 """
-from atom.api import Typed, Unicode, observe, set_default
+import os
+from atom.api import Instance, Typed, Unicode, observe, set_default
 
-from OCC.BRepBuilderAPI import BRepBuilderAPI_MakeShape, BRepBuilderAPI_MakeFace
+from OCC.BRepBuilderAPI import (
+    BRepBuilderAPI_MakeShape, BRepBuilderAPI_MakeFace
+)
 
-from OCC.BRepTools import BRepTools_WireExplorer
+from OCC.BRepTools import BRepTools_WireExplorer, breptools_Read
 from OCC.TopAbs import (
     TopAbs_VERTEX, TopAbs_EDGE, TopAbs_FACE, TopAbs_WIRE,
     TopAbs_SHELL, TopAbs_SOLID, TopAbs_COMPOUND,
@@ -23,7 +26,7 @@ from OCC.TopoDS import (
     topods, TopoDS_Wire, TopoDS_Vertex, TopoDS_Edge,
     TopoDS_Face, TopoDS_Shell, TopoDS_Solid,
     TopoDS_Compound, TopoDS_CompSolid, topods_Edge,
-    topods_Vertex
+    topods_Vertex, TopoDS_Shape
 )
 
 from OCC.BRepPrimAPI import (
@@ -33,10 +36,17 @@ from OCC.BRepPrimAPI import (
     BRepPrimAPI_MakeRevol,
 )
 
+from OCC.BRep import BRep_Builder
+from OCC.IGESControl import IGESControl_Reader
+from OCC.IFSelect import IFSelect_RetDone, IFSelect_ItemsByEntity
+from OCC.STEPCAFControl import STEPCAFControl_Reader
+from OCC.STEPControl import STEPControl_Reader
+from OCC.StlAPI import StlAPI_Reader
+
 from ..shape import (
     ProxyShape, ProxyFace, ProxyBox, ProxyCone, ProxyCylinder,
     ProxyHalfSpace, ProxyPrism, ProxySphere, ProxyWedge,
-    ProxyTorus, ProxyRevol,
+    ProxyTorus, ProxyRevol, ProxyRawShape, ProxyLoadShape
 )
 from OCC.gp import gp_Vec, gp_Ax1
 
@@ -498,9 +508,9 @@ class OccShape(ProxyShape):
     #: Class reference url
     reference = Unicode()
     
-    #--------------------------------------------------------------------------
+    # -------------------------------------------------------------------------
     # Initialization API
-    #--------------------------------------------------------------------------
+    # -------------------------------------------------------------------------
     def create_shape(self):
         """ Create the toolkit shape for the proxy object.
 
@@ -564,6 +574,9 @@ class OccShape(ProxyShape):
         
     def set_axis(self, axis):
         self.create_shape()
+
+    def parent_shape(self):
+        return self.parent().shape
 
 
 class OccDependentShape(OccShape):
@@ -867,3 +880,96 @@ class OccRevol(OccDependentShape, ProxyRevol):
         
     def set_direction(self, direction):
         self.update_shape({})
+
+
+class OccRawShape(OccShape, ProxyRawShape):
+    #: Update the class reference
+    reference = set_default('https://dev.opencascade.org/doc/refman/html/'
+                            'class_topo_d_s___shape.html')
+
+    #: The shape created
+    shape = Instance(TopoDS_Shape)
+
+    def create_shape(self):
+        """ Delegate shape creation to the declaration implementation. """
+        self.shape = self.declaration.create_shape(self.parent_shape())
+
+    # -------------------------------------------------------------------------
+    # ProxyRawShape API
+    # -------------------------------------------------------------------------
+    def get_shape(self):
+        """ Retrieve the underlying toolkit shape.
+        """
+        return self.shape
+
+
+class OccLoadShape(OccShape, ProxyLoadShape):
+    #: Update the class reference
+    reference = set_default('https://dev.opencascade.org/doc/refman/html/'
+                            'class_topo_d_s___shape.html')
+
+    #: The shape created
+    shape = Instance(TopoDS_Shape)
+
+    def create_shape(self):
+        """ Create the shape by loading it from the given path. """
+        self.shape = self.load_shape()
+
+    def load_shape(self):
+        d = self.declaration
+        if not os.path.exists(d.path):
+            raise ValueError("Can't load shape from `{}`, "
+                             "the path does not exist".format(d.path))
+        path, ext = os.path.splitext(d.path)
+        name = ext[1:] if d.loader == 'auto' else d.loader
+        loader = getattr(self, 'load_{}'.format(name.lower()))
+        return loader(d.path)
+
+    def load_brep(self, path):
+        """ Load a brep model """
+        shape = TopoDS_Shape()
+        builder = BRep_Builder()
+        breptools_Read(shape, path, builder)
+        return shape
+
+    def load_iges(self, path):
+        """ Load an iges model """
+        reader = IGESControl_Reader()
+        status = reader.ReadFile(path)
+        if status != IFSelect_RetDone:
+            raise ValueError("Failed to load: {}".format(path))
+        reader.PrintCheckLoad(False, IFSelect_ItemsByEntity)
+        reader.PrintCheckTransfer(False, IFSelect_ItemsByEntity)
+        ok = reader.TransferRoots()
+        return reader.Shape(1)
+
+    def load_step(self, path):
+        """ Alias for stp """
+        return self.load_stp(path)
+
+    def load_stp(self, path):
+        """ Load a stp model """
+        reader = STEPControl_Reader()
+        status = reader.ReadFile(path)
+        if status != IFSelect_RetDone:
+            raise ValueError("Failed to load: {}".format(path))
+        reader.PrintCheckLoad(False, IFSelect_ItemsByEntity)
+        reader.PrintCheckTransfer(False, IFSelect_ItemsByEntity)
+        ok = reader.TransferRoot()
+        return reader.Shape(1)
+
+    def load_stl(self, path):
+        """ Load a stl model """
+        reader = StlAPI_Reader()
+        shape = TopoDS_Shape()
+        reader.Read(shape, path)
+        return shape
+
+    # -------------------------------------------------------------------------
+    # ProxyLoadShape API
+    # -------------------------------------------------------------------------
+    def set_path(self, path):
+        self.create_shape()
+
+    def set_loader(self, loader):
+        self.create_shape()

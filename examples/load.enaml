@@ -1,0 +1,6 @@
+from declaracad.occ.api import *
+
+enamldef Assembly(Part):
+    #: Load stl
+    LoadShape:
+        path = "examples/models/fan.stl"

@@ -25,6 +25,7 @@ class Part(Shape):
     
     Attributes
     ----------
+    
     name: String
         An optional name for the part
     description: String

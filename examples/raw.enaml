@@ -1,0 +1,25 @@
+from atom.api import Unicode
+from enaml.declarative import d_
+from declaracad.occ.api import *
+from OCC.TopoDS import TopoDS_Shape
+from OCC.StlAPI import StlAPI_Reader
+
+class StlShape(RawShape):
+    #: Path to read
+    path = d_(Unicode())
+
+    #: Loads a shape from an stl file
+    def create_shape(self, parent):
+        reader = StlAPI_Reader()
+        shape = TopoDS_Shape()
+        reader.Read(shape, self.path)
+        return shape
+
+    def _observe_path(self, change):
+        #:
+        if change['type'] == 'update':
+            self.proxy.create_shape()
+
+enamldef Assembly(Part):
+    StlShape:
+        path = 'examples/models/fan.stl'

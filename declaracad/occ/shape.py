@@ -187,6 +187,25 @@ class ProxyRevol(ProxyShape):
         raise NotImplementedError
 
 
+class ProxyRawShape(ProxyShape):
+    #: A reference to the shape declaration.
+    declaration = ForwardTyped(lambda: RawShape)
+
+    def get_shape(self):
+        raise NotImplementedError
+
+
+class ProxyLoadShape(ProxyShape):
+    #: A reference to the shape declaration.
+    declaration = ForwardTyped(lambda: LoadShape)
+
+    def set_path(self, path):
+        raise NotImplementedError
+
+    def set_loader(self, loader):
+        raise NotImplementedError
+
+
 class Shape(ToolkitObject):
     """ Abstract shape component that can be displayed on the screen 
     and represented by the framework. 
@@ -789,3 +808,94 @@ class Revol(Shape):
     @observe('shape', 'angle', 'copy')
     def _update_proxy(self, change):
         super(Revol, self)._update_proxy(change)
+
+
+class RawShape(Shape):
+    """ A RawShape is a shape that delegates shape creation to the declaration.
+    This allows custom shapes to be added to the 3D model hierarchy. Users
+    should subclass this and implement the `create_shape` method.
+    
+    Examples
+    --------
+    
+    from OCC.TopoDS import TopoDS_Shape
+    from OCC.StlAPI import StlAPI_Reader
+    
+    class StlShape(RawShape):
+        #: Loads a shape from an stl file
+        def create_shape(self, parent):
+            stl_reader = StlAPI_Reader()
+            shape = TopoDS_Shape()
+            stl_reader.Read(shape, './models/fan.stl')
+            return shape
+            
+    
+    """
+    #: Reference to the implementation control
+    proxy = Typed(ProxyRawShape)
+
+    def create_shape(self, parent):
+        """ Create the shape for the control.
+        This method should create and initialize the shape.
+        
+        Parameters
+        ----------
+        parent : shape or None
+            The parent shape for the control.
+        
+        Returns
+        -------
+        result : shape
+            The shape for the control.
+        
+        
+        """
+        raise NotImplementedError
+
+    def get_shape(self):
+        """ Retrieve the shape for display.
+        
+        Returns
+        -------
+        shape : shape or None
+            The toolkit shape that was previously created by the
+            call to 'create_shape' or None if the proxy is not
+            active or the shape has been destroyed.
+        """
+        if self.proxy_is_active:
+            return self.proxy.get_shape()
+
+
+class LoadShape(Shape):
+    """ Load a shape from the given path. Shapes can be repositioned and
+    colored as needed.
+    
+    Attributes
+    ----------
+    
+    path: String
+        The path of the 3D model to load. Supported types are, .stl, .stp,
+        .igs, and .brep
+    
+    
+    Examples
+    --------
+    
+    LoadShape:
+        path = "examples/models/fan.stl"
+        position = (10, 100, 0)
+    
+    """
+    #: Proxy shape
+    proxy = Typed(ProxyLoadShape)
+
+    #: Path of the shape to load
+    path = d_(Str())
+
+    #: Loader to use
+    loader = d_(Enum('auto', 'stl', 'stp', 'caf', 'iges', 'brep'))
+
+    @observe('path', 'type')
+    def _update_proxy(self, change):
+        """ Base class implementation is sufficient"""
+        super(LoadShape, self)._update_proxy(change)
