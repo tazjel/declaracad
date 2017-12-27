@@ -7,8 +7,8 @@ and [enaml](https://github.com/nucleic/enaml/).
 
 It's similar to [OpenSCAD](http://www.openscad.org/)
 in that everything is intended to be defined programatically. However the 
-language being used is enaml (a superset of python) instead of javascript.  Python users/developers will find this very easy and intuitive.
-
+language being used is enaml (a superset of python) instead of javascript.  
+Python users/developers will find this very easy and intuitive.
 
 
 See [the project site](https://www.codelv.com/projects/declaracad/) (coming soon).
@@ -119,3 +119,11 @@ If you want to use this in your own application these can be replaced with alter
 alternate licensing is needed. Please [contact](https://www.codelv.com/contact/) me for more 
 details.
 
+## Special thanks to
+
+This project relies on the groundwork laid out by these projects: 
+
+- [python-occ](https://github.com/tpaviot/pythonocc)
+- [enaml](https://github.com/nucleic/enaml)
+
+Please share your appreciation to them for all the hard work creating these projects!
