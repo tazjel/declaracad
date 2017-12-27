@@ -18,5 +18,5 @@ setup(
     url='https://github.com/codelv/declaracad',
     packages=find_packages(),
     install_requires=['enaml', 'jsonpickle', 'qtconsole', 'pyflakes',
-                      'QScintilla'],
+                      'QScintilla', 'numpydoc', 'markdown'],
 )
