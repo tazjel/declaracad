@@ -67,6 +67,14 @@ enamldef TurnersCube(Part):
 
 ```
 
+## Docs
+
+The goal is for the building blocks or components to be self documenting. 
+
+It's partially there... suggestions are welcome!
+
+![DeclaraCAD - Docs and Toolbox](https://user-images.githubusercontent.com/380158/34372327-d55d057a-eaa1-11e7-97dc-b95f97511f00.gif)
+
 ## Installing
 
 There is currently no installer as it's in pre-alpha state. It runs on windows and linux 
