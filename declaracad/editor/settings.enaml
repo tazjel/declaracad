@@ -1,0 +1,52 @@
+# -*- coding: utf-8 -*-
+"""
+Copyright (c) 2017, Jairus Martin.
+
+Distributed under the terms of the GPL v3 License.
+
+The full license is in the file LICENSE, distributed with this software.
+
+Created on Dec 28, 2017
+
+@author: jrm
+"""
+from enaml.core.api import Looper, Conditional
+from enaml.layout.api import align, hbox, spacer
+from enaml.widgets.api import (
+    Field, Label, PushButton, Form, ObjectCombo, Container, SpinBox, FileDialogEx
+)
+from enamlx.widgets.api import TreeView, TreeViewItem
+from enaml.scintilla.themes import THEMES
+
+
+enamldef EditorSettingsPage(Container):
+    attr model
+
+    Label:
+        text = "Editor"
+    Form:
+        Label:
+            text = "Zoom"
+        SpinBox:
+            value := model.zoom
+            minimum = -10
+            maximum = 20
+        Label:
+            text = "Theme"
+        ObjectCombo:
+            items = list(THEMES.keys())
+            selected := model.theme
+    Label:
+        text = "Project"
+    Form:
+        Label:
+            text = "Path"
+        Label:
+            text = ""
+        Field:
+            text := model.project_path
+        PushButton:
+            text = "Browse"
+            clicked :: FileDialogEx.get_existing_directory(
+                self,
+                current_path=model.project_path)

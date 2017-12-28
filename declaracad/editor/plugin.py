@@ -183,7 +183,6 @@ class EditorPlugin(Plugin):
             ))
 
         #: Now apply all layout update operations
-        print("Updating dock area: {}".format(ops))
         area.update_layout(ops)
         self.save_dock_area(change)
 

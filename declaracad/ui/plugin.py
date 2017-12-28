@@ -10,7 +10,7 @@ Created on Jul 12, 2015
 @author: jrm
 """
 import enaml
-from atom.api import List, Unicode, Instance
+from atom.api import Atom, List, Unicode, Instance, Dict
 from declaracad.core.api import Plugin, DockItem, log
 from enaml.layout.api import AreaLayout, DockBarLayout, HSplitLayout, TabLayout
 from . import extensions
@@ -18,17 +18,27 @@ from . import extensions
 
 class DeclaracadPlugin(Plugin):
     #: Project site
-    wiki_page = Unicode("https;//www.codelv.com/projects/inkcut")
+    wiki_page = Unicode("https;//www.codelv.com/projects/declaracad")
 
     #: Dock items to add
     dock_items = List(DockItem)
     dock_layout = Instance(AreaLayout)
 
+    #: Settings pages to add
+    settings_pages = List(extensions.SettingsPage)
+
+    #: Current settings page
+    settings_page = Instance(extensions.SettingsPage)
+
+    #: Internal settings models
+    settings_typemap = Dict()
+    settings_model = Instance(Atom)
+
     def start(self):
         """ Load all the plugins declaracad is dependent on """
         w = self.workbench
         self._refresh_dock_items()
-
+        self._refresh_settings_pages()
         super(DeclaracadPlugin, self).start()
 
     def _bind_observers(self):
@@ -39,6 +49,9 @@ class DeclaracadPlugin(Plugin):
         point = workbench.get_extension_point(extensions.DOCK_ITEM_POINT)
         point.observe('extensions', self._refresh_dock_items)
 
+        point = workbench.get_extension_point(extensions.SETTINGS_PAGE_POINT)
+        point.observe('extensions', self._refresh_settings_pages)
+
     def _unbind_observers(self):
         """ Remove the observers for the plugin.
         """
@@ -47,6 +60,12 @@ class DeclaracadPlugin(Plugin):
         point = workbench.get_extension_point(extensions.DOCK_ITEM_POINT)
         point.unobserve('extensions', self._refresh_dock_items)
 
+        point = workbench.get_extension_point(extensions.SETTINGS_PAGE_POINT)
+        point.unobserve('extensions', self._refresh_settings_pages)
+
+    # -------------------------------------------------------------------------
+    # Dock API
+    # -------------------------------------------------------------------------
     def create_new_area(self):
         """ Create the dock area 
         """
@@ -129,3 +148,40 @@ class DeclaracadPlugin(Plugin):
             main,
             dock_bars=dockbars
         )
+
+    # -------------------------------------------------------------------------
+    # Settings API
+    # -------------------------------------------------------------------------
+    def _default_settings_page(self):
+        return self.settings_pages[0]
+
+    def _observe_settings_page(self, change):
+        log.debug("Settings page: {}".format(change))
+
+    def _refresh_settings_pages(self, change=None):
+        """ Reload all SettingsPages registered by any Plugins 
+        
+        Any plugin can add to this list by providing a SettingsPage 
+        extension in their PluginManifest.
+        
+        """
+        workbench = self.workbench
+        point = workbench.get_extension_point(extensions.SETTINGS_PAGE_POINT)
+
+        settings_pages = []
+        typemap = {}
+        for extension in sorted(point.extensions, key=lambda ext: ext.rank):
+            for d in extension.get_children(extensions.SettingsPage):
+                #: Save it
+                settings_pages.append(d)
+
+                #: Update the type map
+                plugin = self.workbench.get_plugin(d.plugin_id)
+                t = type(getattr(plugin, d.model) if d.model else plugin)
+                typemap[t] = d.factory()
+
+        #: Update items
+        log.debug("Updating settings pages: {}".format(settings_pages))
+
+        self.settings_typemap = typemap
+        self.settings_pages = settings_pages

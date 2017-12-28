@@ -18,7 +18,7 @@ from enaml.workbench.core.api import Command
 from enaml.workbench.ui.api import (
     ActionItem, Branding, MenuItem, ItemGroup, Autostart
 )
-from .extensions import DOCK_ITEM_POINT
+from .extensions import DOCK_ITEM_POINT, SETTINGS_PAGE_POINT, SettingsPage
 
 def plugin_factory():
     from declaracad.ui.plugin import DeclaracadPlugin
@@ -64,6 +64,21 @@ def open_url(page):
         subprocess.call([cmd, page])
 
 
+def open_settings(event):
+    ui = event.workbench.get_plugin('enaml.workbench.ui')
+    plugin = event.workbench.get_plugin('declaracad.ui')
+    with enaml.imports():
+        from .settings import SettingsDialog
+
+    SettingsDialog(ui.window, plugin=plugin, event=event).exec_()
+
+
+def settngs_page_factory():
+    with enaml.imports():
+        from .settings import SystemSettingsPage
+    return SystemSettingsPage
+
+
 enamldef UIManifest(PluginManifest):
     """ The plugin manifest for the primary example plugin.
 
@@ -87,12 +102,9 @@ enamldef UIManifest(PluginManifest):
         Command:
             id = 'declaracad.ui.open_preferences'
             handler = open_preferences
-#         Command:
-#             id = 'declaracad.ui.undo'
-#             handler = undo
-#         Command:
-#             id = 'declaracad.ui.redo'
-#             handler = redo
+        Command:
+            id = 'declaracad.ui.open_settings'
+            handler = open_settings
         Command:
             id = 'declaracad.ui.open_url'
             handler = lambda e:open_url(e.parameters.get('url'))
@@ -106,16 +118,32 @@ enamldef UIManifest(PluginManifest):
 
     ExtensionPoint:
        id = DOCK_ITEM_POINT
-       description = "Add items to the dock!"#DOCK_ITEM_DESCRIPTION
+       description = "Add items to the dock"
+
+    ExtensionPoint:
+        id = SETTINGS_PAGE_POINT
+        description = "Add pages to the settings dialog"
+
+    Extension:
+        id = 'settings'
+        point = SETTINGS_PAGE_POINT
+        SettingsPage:
+            name = "System"
+            plugin_id = 'declaracad.ui'
+            factory = settngs_page_factory
 
     Extension:
         id = 'actions'
         point = 'enaml.workbench.ui.actions'
+#        ActionItem:
+#            path = '/settings/prefs'
+#            label = 'Preferences'
+#            command = 'declaracad.ui.open_preferences'
         ActionItem:
-            path = '/settings/prefs'
-            label = 'Preferences'
-            command = 'declaracad.ui.open_preferences'
-
+            path = '/settings/editor'
+            label = 'Editor...'
+            shortcut = 'Ctrl+Alt+S'
+            command = 'declaracad.ui.open_settings'
         ActionItem:
             path = '/help/issues'
             label = 'Report issue...'

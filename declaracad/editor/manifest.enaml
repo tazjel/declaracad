@@ -18,7 +18,7 @@ from enaml.core.api import Looper, Conditional
 from enaml.workbench.api import Extension, PluginManifest
 from enaml.workbench.core.api import Command
 from enaml.workbench.ui.api import ActionItem, MenuItem, ItemGroup, Autostart
-from declaracad.ui.extensions import DOCK_ITEM_POINT, DockItem
+from declaracad.ui.extensions import DOCK_ITEM_POINT, DockItem, SETTINGS_PAGE_POINT, SettingsPage
 
 
 def plugin_command(name, event):
@@ -69,13 +69,7 @@ def save_file_as(event):
         plugin.save_file_as(event)
 
 
-def open_settings(event):
-    ui = event.workbench.get_plugin('enaml.workbench.ui')
-    plugin = event.workbench.get_plugin('declaracad.editor')
-    with enaml.imports():
-        from .views.api import SettingsDialog
 
-    SettingsDialog(ui.window, plugin=plugin, event=event).exec_()
 
 
 def plugin_factory():
@@ -122,6 +116,11 @@ def item_factory():
         from .view import EditorDockItem
     return EditorDockItem
 
+def settings_page_factory():
+    with enaml.imports():
+        from .settings import EditorSettingsPage
+    return EditorSettingsPage
+
 def errors_item_factory():
   with enaml.imports():
     from .view import ErrorsDockItem
@@ -149,6 +148,13 @@ enamldef EditorManifest(PluginManifest):
             factory = errors_item_factory
             layout = 'left'
     Extension:
+        id = 'settings'
+        point = SETTINGS_PAGE_POINT
+        SettingsPage:
+            name = "Editor"
+            plugin_id = 'declaracad.editor'
+            factory = settings_page_factory
+    Extension:
         id = 'autostart'
         point = 'enaml.workbench.ui.autostart'
         Autostart:
@@ -171,9 +177,7 @@ enamldef EditorManifest(PluginManifest):
         Command:
             id = 'declaracad.editor.open_file'
             handler = open_file
-        Command:
-            id = 'declaracad.editor.open_settings'
-            handler = open_settings
+
     
     Extension:
         id = 'actions'
@@ -238,8 +242,4 @@ enamldef EditorManifest(PluginManifest):
             #     path = '/tools'
             #     label = 'Tools'
             #     before = 'workspace'
-        ActionItem:
-            path = '/settings/editor'
-            label = 'Editor...'
-            shortcut = 'Ctrl+Alt+S'
-            command = 'declaracad.editor.open_settings'
+
