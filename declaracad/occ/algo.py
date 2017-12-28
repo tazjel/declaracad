@@ -201,6 +201,9 @@ class ProxyTransform(ProxyOperation):
 
 
 class Operation(Shape):
+    """ Base class for Operations that are applied to other shapes.
+    
+    """
     #: Reference to the implementation control
     proxy = Typed(ProxyOperation)
     
@@ -226,10 +229,10 @@ class BooleanOperation(Operation):
     Attributes
     ----------
     
-        shape1: Shape
-            The first shape argument of the operation.
-        shape2: Shape
-            The second shape argument of the operation.
+    shape1: Shape
+        The first shape argument of the operation.
+    shape2: Shape
+        The second shape argument of the operation.
     
     """
 
@@ -293,15 +296,15 @@ class Cut(BooleanOperation):
 class Fuse(BooleanOperation):
     """ An operation that results in the addition all of the child shapes. 
     
-       Examples
-       ----------
+   Examples
+   ----------
+   
+   Fuse:
+       Box:
+           pass
+       Box:
+           position = (1,0,0)
        
-       Fuse:
-           Box:
-               pass
-           Box:
-               position = (1,0,0)
-           
     """
     #: Reference to the implementation control
     proxy = Typed(ProxyFuse)
@@ -407,6 +410,31 @@ class Chamfer(LocalOperation):
 
 
 class Offset(Operation):
+    """ An operation that create an Offset of the first child shape.
+    
+    Attributes
+    ----------
+    
+    offset: Float
+        The offset distance
+    offset_mode: String
+        Defines the construction type of parallels applied to the free edges 
+        of the shape
+    intersection: Bool
+        Intersection specifies how the algorithm must work in order to limit 
+        the parallels to two adjacent shapes
+    join_type: String
+        Defines how to fill the holes that may appear between parallels to 
+        the two adjacent faces
+    
+        
+    Examples
+    --------
+    
+    See examples/operations.enaml
+        
+    """
+
     #: Reference to the implementation control
     proxy = Typed(ProxyOffset)
     
@@ -430,6 +458,26 @@ class Offset(Operation):
 
 
 class ThickSolid(Offset):
+    """ An operation that creates a hollowed out solid from shape.
+    
+    Attributes
+    ----------
+    
+    closing_faces: List, optional
+        List of faces that bound the solid.
+        
+    Examples
+    --------
+    
+    ThickSolid:
+        #: Creates an open box with a thickness of 0.1
+        offset = 0.1
+        Box: box1:
+            position = (4,-4,0)
+        # Get top face
+        closing_faces << [sorted(box1.shape_faces,key=top_face)[0]] 
+        
+    """
     #: Reference to the implementation control
     proxy = Typed(ProxyThickSolid)
     
@@ -442,6 +490,25 @@ class ThickSolid(Offset):
 
 
 class Pipe(Operation):
+    """ An operation that extrudes a profile along a spline, wire, or path.
+    
+    Attributes
+    ----------
+    
+    spline: Edge or Wire
+        The spline to extrude along.
+    profile: Wire
+        The profile to extrude.
+    fill_mode: String, optional
+        The fill mode to use.
+    
+        
+    Examples
+    --------
+    
+    See examples/pipes.enaml
+        
+    """
     #: Reference to the implementation control
     proxy = Typed(ProxyPipe)
     
@@ -502,6 +569,25 @@ class RevolutionForm(AbstractRibSlot):
     
         
 class ThruSections(Operation):
+    """ An operation that extrudes a shape by means of going through a series
+     of profile sections along a spline or path.  
+    
+    Attributes
+    ----------
+    
+    solid: Bool
+        If True, build a solid otherwise build a shell.
+    ruled: Bool
+        If False, smooth out the surfaces using approximation
+    precision: Float, optional
+        The precision to use for approximation.
+        
+    Examples
+    --------
+    
+    See examples/thru_sections.enaml
+        
+    """
     #: Reference to the implementation control
     proxy = Typed(ProxyThruSections)
     
@@ -528,6 +614,45 @@ class ThruSections(Operation):
 
 
 class Transform(Operation):
+    """ An operation that Transform's an existing shape (or a copy).
+    
+    Attributes
+    ----------
+    
+    shape: Shape or None
+        Shape to transform. If none is given it will use the first child. If
+        given it will make a transformed copy the reference shape.
+    mirror: Tuple or List
+        Mirror transformation to apply to the shape. Should be a list for each
+        axis (True, False, True).
+    scale: Tuple or List
+        Scale to apply to the shape. Should be a list of float values 
+        for each axis ex. (2, 2, 2).
+    rotate: Tuple or List
+        Rotation to apply to the shape. Should be a list of float values 
+        (in radians) for each axis ex. (0, math.pi/2, 0).
+    translate: Tuple or List
+        Translation to apply to the shape. Should be a list of float values 
+        for each axis ex. (0, 0, 100).
+        
+    Examples
+    --------
+    
+    Transform:
+        rotate = (math.pi/4, 0, 0) 
+        Box: box:
+            pass
+            
+    #: Or
+    Cylinder: cyl
+        pass
+    
+    Transform:
+        #: Create a copy and move it
+        shape = cyl
+        translate = (10, 20, 0)
+        
+    """
     #: Reference to the implementation control
     proxy = Typed(ProxyTransform)
     
