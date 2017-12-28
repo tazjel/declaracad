@@ -157,6 +157,7 @@ enamldef EditorManifest(PluginManifest):
     Extension:
         id = 'autostart'
         point = 'enaml.workbench.ui.autostart'
+        rank = 100
         Autostart:
             plugin_id = 'declaracad.editor'
     Extension:

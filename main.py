@@ -24,6 +24,8 @@ from declaracad.core.workbench import DeclaracadWorkbench
 
 with enaml.imports():
     #: TODO autodiscover these
+    from declaracad.core.manifest import DeclaracadManifest
+    from declaracad.ui.manifest import UIManifest
     from declaracad.occ.manifest import ViewerManifest
     from declaracad.console.manifest import ConsoleManifest
     from declaracad.docs.manifest import DocsManifest
@@ -32,6 +34,8 @@ with enaml.imports():
 
 if __name__ == '__main__':
     workbench = DeclaracadWorkbench()
+    workbench.register(DeclaracadManifest())
+    workbench.register(UIManifest())
     workbench.register(ConsoleManifest())
     workbench.register(DocsManifest())
     workbench.register(ViewerManifest())

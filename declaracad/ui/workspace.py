@@ -40,7 +40,11 @@ class DeclaracadWorkspace(Workspace):
         self.content = Container(padding=0)
         manifest = UIManifest()
         self._manifest_id = manifest.id
-        self.workbench.register(manifest)
+        try:
+            self.workbench.register(manifest)
+        except ValueError:
+            #: Already registered
+            pass
         self.workbench.get_plugin('declaracad.ui')
         self.load_area()
 

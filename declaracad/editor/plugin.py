@@ -24,7 +24,7 @@ from enaml.scintilla.themes import THEMES
 from enaml.application import timed_call
 from enaml.core.enaml_compiler import EnamlCompiler
 from enaml.core.parser import parse
-from enaml.layout.api import InsertTab, RemoveItem
+from enaml.layout.api import InsertItem, InsertTab, RemoveItem
 from types import ModuleType
 from future.utils import exec_
 from glob import glob
@@ -46,13 +46,13 @@ class Document(Model):
     cursor = Tuple(default=(0, 0))
 
     #: Any unsaved changes
-    unsaved = Bool(True).tag(config=True)
+    unsaved = Bool(True)
 
     #: Any linting errors
-    errors = List().tag(config=True)
+    errors = List()
 
     #: Any autocomplete suggestions
-    suggestions = List().tag(config=True)
+    suggestions = List()
 
     #: Checker instance
     checker = Instance(inspection.Checker)
@@ -123,6 +123,12 @@ class EditorPlugin(Plugin):
     sys_path = List().tag(config=True)
     _area_saves_pending = Int()
 
+    def start(self):
+        """ Make sure the documents all open on startup """
+        super(EditorPlugin, self).start()
+        self.workbench.application.deferred_call(
+            self._update_area_layout, {'type': 'manual'})
+
     # -------------------------------------------------------------------------
     # Editor API
     # -------------------------------------------------------------------------
@@ -162,6 +168,12 @@ class EditorPlugin(Plugin):
             #: Determine which changed
             removed = old.difference(new)
             added = new.difference(old)
+        elif change['type'] == 'manual':
+            old = set([self.active_document])
+            new = set(self.documents)
+            #: Determine which changed
+            removed = old.difference(new)
+            added = new.difference(old)
 
         #: Update operations to apply
         ops = []
@@ -174,6 +186,7 @@ class EditorPlugin(Plugin):
 
         #: Add any new items
         for doc in added:
+            log.debug("Adding: editor-item-{}".format(doc.name))
             targets = ['editor-item-{}'.format(d.name) for d in self.documents
                        if d.name != doc.name]
             item = EditorDockItem(area, plugin=self, doc=doc)
@@ -253,9 +266,13 @@ class EditorPlugin(Plugin):
         doc = opened[0]
         self.documents.remove(doc)
 
+        #: If we removed al of them
+        if not self.documents:
+            self.documents = self._default_documents()
+
         #: If we closed the active document
         if self.active_document == doc:
-            self.active_document = docs[0] if docs else Document()
+            self.active_document = self.documents[0]
 
     def open_file(self, event):
         """ Open a file from the local filesystem 

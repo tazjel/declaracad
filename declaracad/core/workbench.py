@@ -97,13 +97,10 @@ class DeclaracadWorkbench(UIWorkbench):
         with enaml.imports():
             from enaml.workbench.core.core_manifest import CoreManifest
             from enaml.workbench.ui.ui_manifest import UIManifest
-            from declaracad.core.manifest import DeclaracadManifest
-            #from inkcut.settings.manifest import SettingsManifest
 
         self.register(CoreManifest())
         self.register(UIManifest())
-        self.register(DeclaracadManifest())
-        #self.register(SettingsManifest())
+
         #: Init the ui
         ui = self.get_plugin('enaml.workbench.ui')
         ui.show_window()

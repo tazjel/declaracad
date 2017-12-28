@@ -112,6 +112,7 @@ enamldef UIManifest(PluginManifest):
     Extension:
         id = 'autostart'
         point = 'enaml.workbench.ui.autostart'
+        rank = -99
         Autostart:
             plugin_id = 'declaracad.ui'
 

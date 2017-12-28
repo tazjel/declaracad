@@ -24,13 +24,9 @@ class CorePlugin(Plugin):
         '%(asctime)-15s | %(levelname)-7s | %(name)s | %(message)s')
 
     def start(self):
+        """ Setup logging """
         self.init_logging()
-        self.workbench.application.deferred_call(self.start_default_workspace)
-
-    def start_default_workspace(self):
-        ui = self.workbench.get_plugin('enaml.workbench.ui')
-        ui.select_workspace('declaracad.workspace')
-
+        super(CorePlugin, self).start()
 
     def _default__log_filename(self):
         log_dir = os.path.expanduser('~/.config/declaracad/logs')

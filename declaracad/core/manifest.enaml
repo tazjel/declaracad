@@ -10,7 +10,7 @@ Created on Dec 6, 2015
 @author: jrm
 """
 from enaml.workbench.api import Extension, PluginManifest
-from enaml.workbench.ui.api import ActionItem, MenuItem, ItemGroup
+from enaml.workbench.ui.api import ActionItem, MenuItem, ItemGroup, Autostart
 
 
 def application_factory():
@@ -106,3 +106,10 @@ enamldef DeclaracadManifest(PluginManifest):
         id = 'window'
         point = 'enaml.workbench.ui.window_factory'
         factory = window_factory
+
+    Extension:
+        id = 'autostart'
+        point = 'enaml.workbench.ui.autostart'
+        rank = -100
+        Autostart:
+            plugin_id = 'declaracad.core'

@@ -37,9 +37,15 @@ class DeclaracadPlugin(Plugin):
     def start(self):
         """ Load all the plugins declaracad is dependent on """
         w = self.workbench
+        super(DeclaracadPlugin, self).start()
         self._refresh_dock_items()
         self._refresh_settings_pages()
-        super(DeclaracadPlugin, self).start()
+
+        #self.workbench.application.deferred_call(self.start_default_workspace)
+
+    def start_default_workspace(self):
+        ui = self.workbench.get_plugin('enaml.workbench.ui')
+        ui.select_workspace('declaracad.workspace')
 
     def _bind_observers(self):
         """ Setup the observers for the plugin.
@@ -85,6 +91,8 @@ class DeclaracadPlugin(Plugin):
             area: DockArea
         """
         ui = self.workbench.get_plugin('enaml.workbench.ui')
+        if not ui.workspace or not ui.workspace.content:
+            ui.select_workspace('declaracad.workspace')
         return ui.workspace.content.find('dock_area')
 
     def _refresh_dock_items(self, change=None):
