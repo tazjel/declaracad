@@ -103,6 +103,9 @@ pip install git+https://github.com/frmdstryr/enamlx.git
 #: Now install clone this repo
 git clone https://github.com/codelv/declaracad.git
 
+#: Go inside the cloned repo
+cd declaracad
+
 #: Install the dependencies
 pip install .
 
