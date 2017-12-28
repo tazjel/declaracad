@@ -110,41 +110,111 @@ class Point(Shape):
     --------
     
     Point:
-        positon = (10, 100, 0)
+        position = (10, 100, 0)
     
     """
     proxy = Typed(ProxyPoint)
 
 
 class Vertex(Shape):
+    """ A Vertex at a specific position.
+    
+    Examples
+    --------
+    
+    Vertex:
+        position = (10, 100, 0)
+    
+    """
     proxy = Typed(ProxyVertex)
 
 
 class Edge(Shape):
+    """ An Edge is a base class for Lines and Wires.
+    
+    """
     proxy = Typed(ProxyEdge)
 
 
 class Line(Edge):
-    """ Creates a line passing through point P and parallel to vector V 
-    (P and V are, respectively, the origin and the unit vector 
-    of the positioning axis of the line).
+    """ Creates a Line passing through the position and parallel to vector 
+    given by the direction.
+    
+    Attributes
+    ----------
+        position: Tuple
+            The position of the line.
+        direction: Tuple
+            The direction of the line.
+             
+    Examples
+    --------
+    
+    Line:
+        position = (10, 10, 10)
+        direction = (0, 0, 1)
+    
     """
     proxy = Typed(ProxyLine)
 
 
 class Segment(Line):
-    """ Creates a segment from two points. """
+    """ Creates a line Segment from two child points. 
+    
+    Examples
+    --------
+    
+    Segment:
+        Point:
+            position = (0, 0, 0)
+        
+        Point:
+            position = (10, 0, 0)
+    
+    
+    """
     proxy = Typed(ProxySegment)
 
 
 class Arc(Line):
-    """ Creates an arc using one of the following constructors:
+    """ Creates an Arc that can be used to build a Wire. 
     
-    1. three points
+    Attributes
+    ----------
+    
+    radius: Float, optional
+        The radius of the arc.
+    alpha1: Float, optional
+        The starting angle of the arc. 
+    alpha2: Float, optional
+        The ending angle of the arc. 
+    
+    Notes
+    ------
+    An arc can be constructed using:
+    
+    1. three child Points
     2. axis, radius, alpha 1, alpha 2
-    3. axis, radius, and two points
-    4. axis, radius, one point and alpha 1 
-    
+    3. axis, radius, and two child Points
+    4. axis, radius, one child Point and alpha 1
+     
+    Examples
+    ---------
+    import math
+    Wire:
+        Arc: 
+            attr deg = 5
+            radius = 1
+            alpha1 = math.radians(deg)
+            alpha2 = math.radians(deg+2)
+    Wire:
+        Arc:
+            Point:
+                position = (1, 0, 0)
+            Point:
+                position = (2, 5, 0)
+            Point:
+                position = (3, 0, 0)
     
     """
     proxy = Typed(ProxyArc)
@@ -160,8 +230,22 @@ class Arc(Line):
 
 
 class Circle(Edge):
-    """ A2 locates the circle and gives its orientation in 3D space.
-    Use point and direction. 
+    """ Creates a Circle.   
+    
+    Attributes
+    ----------
+    
+    radius: Float
+        The radius of the circle
+    
+    Examples
+    --------
+    
+    Circle:
+        radius = 5
+        position = (0, 0, 10)
+        direction = (1, 0, 0)
+    
     """
     proxy = Typed(ProxyCircle)
     
@@ -174,7 +258,23 @@ class Circle(Edge):
 
 
 class Ellipse(Edge):
-    """ A2 locates the circle and gives its orientation in 3D space.
+    """ Creates an Ellipse.
+    
+    Attributes
+    ----------
+
+    major_radius: Float
+        The radius of the circle
+    minor_radius: Float
+        The second radius of the circle
+    
+    Examples
+    --------
+    
+    Ellipse:
+        major_radius = 5
+        minor_radius = 7
+    
     """
     proxy = Typed(ProxyEllipse)
     
@@ -190,22 +290,44 @@ class Ellipse(Edge):
 
 
 class Hyperbola(Edge):
-    """ Creates a hyperbola with radii MajorRadius and MinorRadius, positioned 
-    in the space by the coordinate system A2 such that:
+    """ Creates a Hyperbola. 
+    
+    Attributes
+    ----------
+
+    major_radius: Float
+        The major radius of the hyperbola
+    minor_radius: Float
+        The minor radius of the hyperbola
+    
+    Notes
+    ------
+    
+    The hyperbola is positioned in the space by the coordinate system A2 such 
+    that:
 
     - the origin of A2 is the center of the hyperbola,
     - the "X Direction" of A2 defines the major axis of the hyperbola, that is, 
         the major radius MajorRadius is measured along this axis, and
     - the "Y Direction" of A2 defines the minor axis of the hyperbola, that is, 
-        the minor radius MinorRadius is measured along this axis. 
+        the minor radius MinorRadius is measured along this axis.
     
-    Note: This class does not prevent the creation of a hyperbola where:
+    This class does not prevent the creation of a hyperbola where:
     - MajorAxis is equal to MinorAxis, or
     - MajorAxis is less than MinorAxis. Exceptions Standard_ConstructionError 
         if MajorAxis or MinorAxis is negative. 
     
     Raises ConstructionError if MajorRadius < 0.0 or MinorRadius < 0.0 Raised 
         if MajorRadius < 0.0 or MinorRadius < 0.0
+    
+    Examples
+    --------
+    
+    Wire:
+        Hyperbola:
+            major_radius = 5
+            minor_radius = 3
+    
     """
     proxy = Typed(ProxyHyperbola)
     
@@ -221,12 +343,30 @@ class Hyperbola(Edge):
 
 
 class Parabola(Edge):
-    """ Creates a parabola with its local coordinate system "A2" and it's focal 
-    length "Focal". 
+    """ Creates a Parabola with its local coordinate system given by the
+    `position` and `direction` and it's focal length `focal_length`.
+     
+    Attributes
+    ----------
+    
+    focal_length: Float
+        The focal length of the parabola.
+    
+    Notes
+    -----
     The XDirection of A2 defines the axis of symmetry of the parabola. 
     The YDirection of A2 is parallel to the directrix of the parabola. 
     The Location point of A2 is the vertex of the parabola 
-    Raises ConstructionError if Focal < 0.0 Raised if Focal < 0.0. 
+    Raises ConstructionError if Focal < 0.0 Raised if Focal < 0.0.
+    
+    Examples
+    ---------
+    
+    Wire:
+        Parabola:
+            focal_length = 10
+        
+    
     """
     proxy = Typed(ProxyParabola)
     
@@ -239,8 +379,27 @@ class Parabola(Edge):
 
 
 class Polygon(Edge):
-    """ A polygonal wire can be built from any number of points or vertices, 
-    and consists of a sequence of connected rectilinear edges. 
+    """ A Polygon that can be built from any number of points or vertices, 
+    and consists of a sequence of connected rectilinear edges.
+    
+    Attributes
+    ----------
+    
+    closed: Bool,
+        Automatically close the polygon.
+         
+    Examples
+    ---------
+    
+    Wire:
+        Polygon:
+            closed = True
+            Looper:
+                iterable = [(0, 0, 0), (10, 0, 0), (10, 10, 0), (0, 10, 0)]
+                Point:
+                    position = loop_item
+    
+    
     """
     proxy = Typed(ProxyPolygon)
     
@@ -253,6 +412,28 @@ class Polygon(Edge):
 
 
 class Wire(Shape):
+    """ A Wire is a Path or series of Segment, Arcs, etc... All child items
+    must be connected or an error will be thrown.
+    
+    Attributes
+    ----------
+    
+    edges: List, optional
+        Edges used to build the wire.  
+         
+    Examples
+    ---------
+    
+    Wire:
+        Polygon:
+            closed = True
+            Looper:
+                iterable = [(0, 0, 0), (10, 0, 0), (10, 10, 0), (0, 10, 0)]
+                Point:
+                    position = loop_item
+    
+    
+    """
     proxy = Typed(ProxyWire)
     
     #: Edges used to create this wire 

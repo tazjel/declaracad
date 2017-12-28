@@ -333,6 +333,9 @@ class OccThickSolid(OccOffset, ProxyThickSolid):
     
 
 class OccPipe(OccOperation, ProxyPipe):
+    reference = set_default('https://dev.opencascade.org/doc/refman/html/'
+                            'class_b_rep_offset_a_p_i___make_pipe.html')
+
     #: References to observed shapes
     _old_spline = Instance(OccShape)
     _old_profile = Instance(OccShape)
@@ -404,6 +407,8 @@ class OccPipe(OccOperation, ProxyPipe):
 
 
 class OccThruSections(OccOperation, ProxyThruSections):
+    reference = set_default('https://dev.opencascade.org/doc/refman/html/'
+                            'class_b_rep_offset_a_p_i___thru_sections.html')
 
     def update_shape(self, change):
         from .occ_draw import OccVertex, OccWire
@@ -437,6 +442,8 @@ class OccThruSections(OccOperation, ProxyThruSections):
 
 
 class OccTransform(OccOperation, ProxyTransform):
+    reference = set_default('https://dev.opencascade.org/doc/refman/html/'
+                            'classgp___trsf.html')
     
     _old_shape = Instance(OccShape)
     
@@ -457,18 +464,18 @@ class OccTransform(OccOperation, ProxyTransform):
         #: TODO: Order matters... how to configure it???
         if d.mirror:
             try:
-                p,v = d.mirror
+                p, v = d.mirror
             except ValueError:
                 raise ValueError("You must specify a tuple containing a "
-                                 "(point,direction)")
+                                 "(point, direction)")
             t.SetMirror(gp_Ax1(gp_Pnt(*p),
                                gp_Dir(*v)))
         if d.scale:
             try:
-                p,s = d.scale
+                p, s = d.scale
             except ValueError:
                 raise ValueError("You must specify a tuple containing a "
-                                 "(point,scale)")
+                                 "(point, scale)")
             t.SetScale(gp_Pnt(*p), s)
         
         if d.translate:
@@ -476,10 +483,10 @@ class OccTransform(OccOperation, ProxyTransform):
         
         if d.rotate:
             try:
-                p,v,a = d.rotate
+                p, v, a = d.rotate
             except ValueError:
                 raise ValueError("You must specify a tuple containing a "
-                                 "(point,direction,angle)")
+                                 "(point, direction, angle)")
             t.SetRotation(gp_Ax1(gp_Pnt(*p),
                                  gp_Dir(*v)), a)
             

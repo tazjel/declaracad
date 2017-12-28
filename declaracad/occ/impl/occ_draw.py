@@ -3,10 +3,7 @@ Created on Sep 30, 2016
 
 @author: jrm
 """
-from atom.api import (
-   Typed, Int, List
-)
-
+from atom.api import Typed, Int, List, set_default
 from enaml.application import timed_call
 
 from ..draw import (
@@ -29,6 +26,10 @@ from OCC.TopoDS import TopoDS_Vertex, topods
 
 
 class OccPoint(OccShape, ProxyPoint):
+    #: Update the class reference
+    reference = set_default('https://dev.opencascade.org/doc/refman/html/'
+                            'classgp___pnt.html')
+
     #: A reference to the toolkit shape created by the proxy.
     shape = Typed(gp_Pnt)
     
@@ -45,6 +46,10 @@ class OccPoint(OccShape, ProxyPoint):
 
 
 class OccVertex(OccShape, ProxyVertex):
+    #: Update the class reference
+    reference = set_default('https://dev.opencascade.org/doc/refman/html/'
+                            'class_b_rep_builder_a_p_i___make_vertex.html')
+
     #: A reference to the toolkit shape created by the proxy.
     shape = Typed(TopoDS_Vertex)
     
@@ -64,6 +69,9 @@ class OccVertex(OccShape, ProxyVertex):
 
 
 class OccEdge(OccShape, ProxyEdge):
+    #: Update the class reference
+    reference = set_default('https://dev.opencascade.org/doc/refman/html/'
+                            'class_b_rep_builder_a_p_i___make_edge.html')
     shape = Typed(BRepBuilderAPI_MakeEdge)
     
     def make_edge(self, *args):
@@ -71,7 +79,10 @@ class OccEdge(OccShape, ProxyEdge):
 
 
 class OccLine(OccEdge, ProxyLine):
-    
+    #: Update the class reference
+    reference = set_default('https://dev.opencascade.org/doc/refman/html/'
+                            'classgp___lin.html')
+
     def create_shape(self):
         pass
     
@@ -102,7 +113,10 @@ class OccLine(OccEdge, ProxyLine):
 
 
 class OccSegment(OccLine, ProxySegment):
-    
+    #: Update the class reference
+    reference = set_default('https://dev.opencascade.org/doc/refman/html/'
+                            'class_g_c___make_segment.html')
+
     shape = List(BRepBuilderAPI_MakeEdge)
     
     def get_points(self):
@@ -111,16 +125,19 @@ class OccSegment(OccLine, ProxySegment):
     def update_shape(self,change):
         d = self.declaration
         points = self.get_points()
-        if len(points)>1:
+        if len(points) > 1:
             edges = []
-            for i in range(1,len(points)):
+            for i in range(1, len(points)):
                 segment = GC_MakeSegment(points[i-1], points[i]).Value()
                 edges.append(BRepBuilderAPI_MakeEdge(segment))
             self.shape = edges
 
 
 class OccArc(OccLine, ProxyArc):
-    
+    #: Update the class reference
+    reference = set_default('https://dev.opencascade.org/doc/refman/html/'
+                            'class_g_c___make_arc_of_circle.html')
+
     def update_shape(self,change):
         d = self.declaration
         points = [c.shape for c in self.children()]
@@ -163,6 +180,10 @@ class OccArc(OccLine, ProxyArc):
 
 
 class OccCircle(OccEdge, ProxyCircle):
+    #: Update the class reference
+    reference = set_default('https://dev.opencascade.org/doc/refman/html/'
+                            'classgp___circ.html')
+
     def create_shape(self):
         d = self.declaration
         self.make_edge(gp_Circ(d.axis, d.radius))
@@ -172,6 +193,9 @@ class OccCircle(OccEdge, ProxyCircle):
 
 
 class OccEllipse(OccEdge, ProxyEllipse):
+    #: Update the class reference
+    reference = set_default('https://dev.opencascade.org/doc/refman/html/'
+                            'classgp___elips.html')
     
     def create_shape(self):
         d = self.declaration
@@ -185,7 +209,10 @@ class OccEllipse(OccEdge, ProxyEllipse):
 
 
 class OccHyperbola(OccEdge, ProxyHyperbola):
-    
+    #: Update the class reference
+    reference = set_default('https://dev.opencascade.org/doc/refman/html/'
+                            'classgp___hypr.html')
+
     def create_shape(self):
         d = self.declaration
         self.make_edge(gp_Hypr(d.axis, d.major_radius, d.minor_radius))
@@ -198,6 +225,9 @@ class OccHyperbola(OccEdge, ProxyHyperbola):
 
 
 class OccParabola(OccEdge, ProxyParabola):
+    #: Update the class reference
+    reference = set_default('https://dev.opencascade.org/doc/refman/html/'
+                            'classgp___parab.html')
     
     def create_shape(self):
         d = self.declaration
@@ -208,7 +238,10 @@ class OccParabola(OccEdge, ProxyParabola):
 
 
 class OccPolygon(OccDependentShape, OccEdge, ProxyPolygon):
-    
+    #: Update the class reference
+    reference = set_default('https://dev.opencascade.org/doc/refman/html/'
+                            'class_b_rep_builder_a_p_i___make_polygon.html')
+
     shape = Typed(BRepBuilderAPI_MakePolygon)
     
     def update_shape(self, change):
@@ -224,6 +257,10 @@ class OccPolygon(OccDependentShape, OccEdge, ProxyPolygon):
 
 
 class OccWire(OccShape, ProxyWire):
+    #: Update the class reference
+    reference = set_default('https://dev.opencascade.org/doc/refman/html/'
+                            'class_b_rep_builder_a_p_i___make_wire.html')
+
     _update_count = Int(0)
     
     #: Make wire
@@ -269,7 +306,7 @@ class OccWire(OccShape, ProxyWire):
         
     def _queue_update(self,change=None):
         change = change or {}
-        self._update_count +=1
+        self._update_count += 1
         timed_call(0, self._dequeue_update, change)
     
     def _dequeue_update(self, change):
