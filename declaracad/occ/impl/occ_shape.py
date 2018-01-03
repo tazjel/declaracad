@@ -7,7 +7,7 @@ import os
 from atom.api import Instance, Typed, Unicode, observe, set_default
 
 from OCC.BRepBuilderAPI import (
-    BRepBuilderAPI_MakeShape, BRepBuilderAPI_MakeFace
+    BRepBuilderAPI_MakeShape, BRepBuilderAPI_MakeFace, BRepBuilderAPI_Transform
 )
 
 from OCC.BRepTools import BRepTools_WireExplorer, breptools_Read
@@ -48,7 +48,7 @@ from ..shape import (
     ProxyHalfSpace, ProxyPrism, ProxySphere, ProxyWedge,
     ProxyTorus, ProxyRevol, ProxyRawShape, ProxyLoadShape
 )
-from OCC.gp import gp_Vec, gp_Ax1
+from OCC.gp import gp_Vec, gp_Ax1, gp_Ax3, gp_Trsf
 
 
 class WireExplorer(object):
@@ -909,11 +909,20 @@ class OccLoadShape(OccShape, ProxyLoadShape):
                             'class_topo_d_s___shape.html')
 
     #: The shape created
-    shape = Instance(TopoDS_Shape)
+    shape = Instance(BRepBuilderAPI_Transform)
 
     def create_shape(self):
         """ Create the shape by loading it from the given path. """
-        self.shape = self.load_shape()
+        shape = self.load_shape()
+        t = self.get_transform()
+        self.shape = BRepBuilderAPI_Transform(shape, t, False)
+
+    def get_transform(self):
+        d = self.declaration
+        t = gp_Trsf()
+        #p = d.position
+        t.SetTransformation(gp_Ax3(d.axis))#gp_Vec(p.X(), p.Y(), p.Z()))
+        return t
 
     def load_shape(self):
         d = self.declaration

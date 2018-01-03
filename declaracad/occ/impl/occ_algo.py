@@ -213,11 +213,11 @@ class OccChamfer(OccOperation, ProxyChamfer):
         
         shape = BRepFilletAPI_MakeChamfer(s.shape.Shape())
         
-        for edge,face in self.get_edges(s):
+        for edge, face in self.get_edges(s):
             args = [d.distance]
             if d.distance2:
                 args.append(d.distance2)
-            args.extend([edge,face])
+            args.extend([edge, face])
             shape.Add(*args)
                 
         self.shape = shape
@@ -504,7 +504,8 @@ class OccTransform(OccOperation, ProxyTransform):
             make_copy = False
             s = self.get_shape()
         t = self.get_transform()
-        self.shape = BRepBuilderAPI_Transform(s.shape.Shape(), t, make_copy)
+        shape = s.shape.Shape() if hasattr(s.shape, 'Shape') else s.shape
+        self.shape = BRepBuilderAPI_Transform(shape, t, make_copy)
 
     def set_shape(self, shape):
         if self._old_shape:
